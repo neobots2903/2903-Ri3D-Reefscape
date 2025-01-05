@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 
@@ -22,14 +21,14 @@ public final class Constants {
   }
 
   public static final class DriveConstants {
-    public static final int kFrontLeftMotorPort = 15; // 13
-    public static final int kRearLeftMotorPort = 13; // 15
+    public static final int kFrontLeftMotorPort = 15;
+    public static final int kRearLeftMotorPort = 13;
     public static final int kFrontRightMotorPort = 12;
     public static final int kRearRightMotorPort = 14;
 
-    public static final double kTrackWidth = 0.5;
+    public static final double kTrackWidth = 0.5; // 0.5 what?
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = 0.7;
+    public static final double kWheelBase = 0.7; // 0.7 what?
     // Distance between centers of front and back wheels on robot
 
     public static final MecanumDriveKinematics kDriveKinematics =
@@ -38,20 +37,5 @@ public final class Constants {
             new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
-
-    // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-    // These characterization values MUST be determined either experimentally or theoretically
-    // for *your* robot's drive.
-    // The SysId tool provides a convenient method for obtaining these values for your robot.
-    public static final SimpleMotorFeedforward kFeedforward =
-        new SimpleMotorFeedforward(1, 0.8, 0.15);
-
-    // Example value only - as above, this must be tuned for your drive!
-    public static final double kPFrontLeftVel = 0.5;
-    public static final double kPRearLeftVel = 0.5;
-    public static final double kPFrontRightVel = 0.5;
-    public static final double kPRearRightVel = 0.5;
-
   }
-  
 }
