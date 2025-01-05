@@ -22,6 +22,11 @@ public class RobotContainer {
   private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
   private final double DEADZONE_THRESH = 0.1;
 
+  // Climb stuff, move later.
+  private Boolean lastClimbState = false;
+  private final int climbCurrentEnabled = 40;
+  private final int climbCurrentDisabled = 0;
+
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final XboxController m_driverController =
       new XboxController(OperatorConstants.kDriverControllerPort);
@@ -64,10 +69,16 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(0.5)))
         .onFalse(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(1)));
   
-
+        // Climb up cage when Y is held
     new JoystickButton(m_operatorController, Button.kY.value)
-        .onTrue(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0.5)))
+        .onTrue(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0.85)))
         .onFalse(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0)));
+
+        // Toggles the climb engagement mechanism. Default false.
+    new JoystickButton(m_operatorController, Button.kX.value)
+        .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(
+          lastClimbState ? climbCurrentDisabled : climbCurrentEnabled
+          )));
   }
   
   private double deadzone(double val) {
