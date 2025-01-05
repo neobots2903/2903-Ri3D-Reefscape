@@ -4,8 +4,15 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.ClimbConstants;
 
 // TODO:
 /*
@@ -13,15 +20,40 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * Find out which encoders the build team will grace us with, if any...
  */
 
- // ASSUMPTIONS:
+ // Hardware:
  /*
-  * Single CIM for climb.
-  * Single BAG for grab.
+  * 2 CIM for climb.
+  * 1 mini CIM for engage.
   */
 
 public class ClimbSubsystem extends SubsystemBase {
+
+  private final WPI_TalonSRX m_frontClimb = new WPI_TalonSRX(ClimbConstants.kFrontClimbMotorPort);
+  private final WPI_TalonSRX m_rearClimb = new WPI_TalonSRX(ClimbConstants.kRearClimbMotorPort);
+  private final WPI_TalonSRX m_engageClimb = new WPI_TalonSRX(ClimbConstants.kEngageClimbMotorPort);
+
+
   public ClimbSubsystem() {
-    // Some initialization
+    // Set one climb to follower
+    m_rearClimb.set(TalonSRXControlMode.Follower, ClimbConstants.kFrontClimbMotorPort);
+
+    // Set Brake Mode
+    m_rearClimb.setNeutralMode(NeutralMode.Brake);
+    m_frontClimb.setNeutralMode(NeutralMode.Brake);
+
+    /* Configure the left Talon's selected sensor as local QuadEncoder */
+    m_engageClimb.configSelectedFeedbackSensor(	FeedbackDevice.QuadEncoder,	// Local Feedback Source
+                                                0,		            // PID Slot for Source [0, 1]
+                                                Constants.kTimeoutMs);		// Configuration Timeout
+  }
+
+  public void setClimbPower(double percentOutput){
+    m_frontClimb.set(TalonSRXControlMode.PercentOutput, percentOutput);
+  }
+
+  // Will need a PID loop in current mode(?) for keeping constant pressure on the cage.
+  public void setEngagePower(double percentOutput){
+    m_engageClimb.set(TalonSRXControlMode.PercentOutput, percentOutput);
   }
 
   /**

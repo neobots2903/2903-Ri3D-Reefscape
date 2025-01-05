@@ -16,8 +16,11 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final int kTimeoutMs = 30;
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
   }
 
   public static final class DriveConstants {
@@ -37,5 +40,11 @@ public final class Constants {
             new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+  }
+
+  public static final class ClimbConstants {
+    public static final int kFrontClimbMotorPort = 0;
+    public static final int kRearClimbMotorPort = 0;
+    public static final int kEngageClimbMotorPort = 0;
   }
 }

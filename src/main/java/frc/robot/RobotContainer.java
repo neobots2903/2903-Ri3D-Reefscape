@@ -19,11 +19,15 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
+  private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
   private final double DEADZONE_THRESH = 0.1;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final XboxController m_driverController =
       new XboxController(OperatorConstants.kDriverControllerPort);
+
+  private final XboxController m_operatorController = 
+      new XboxController(OperatorConstants.kOperatorControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -60,6 +64,10 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(0.5)))
         .onFalse(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(1)));
   
+
+    new JoystickButton(m_operatorController, Button.kY.value)
+        .onTrue(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0.5)))
+        .onFalse(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0)));
   }
   
   private double deadzone(double val) {
