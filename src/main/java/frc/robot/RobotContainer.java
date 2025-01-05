@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.subsystems.*;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -21,11 +22,6 @@ public class RobotContainer {
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
   private final double DEADZONE_THRESH = 0.1;
-
-  // Climb stuff, move later.
-  private Boolean lastClimbState = false;
-  private final int climbCurrentEnabled = 40;
-  private final int climbCurrentDisabled = 0;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final XboxController m_driverController =
@@ -64,20 +60,26 @@ public class RobotContainer {
                     false),
             m_driveSubsystem));
 
+            
+    //DRIVER CONTROLLER
+
         // Drive at half speed when the right bumper is held
     new JoystickButton(m_driverController, Button.kRightBumper.value)
         .onTrue(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(0.5)))
         .onFalse(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(1)));
   
+
+    //OPERATOR CONTROLLER
+
         // Climb up cage when Y is held
     new JoystickButton(m_operatorController, Button.kY.value)
         .onTrue(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0.85)))
         .onFalse(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0)));
 
-        // Toggles the climb engagement mechanism. Default false.
+        // X button toggles the climb engagement mechanism. Default false.
     new JoystickButton(m_operatorController, Button.kX.value)
         .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(
-          lastClimbState ? climbCurrentDisabled : climbCurrentEnabled
+          m_climbSubsystem.getEngagedStatus() ? ClimbConstants.kClimbCurrentDisabled : ClimbConstants.kClimbCurrentEnabled
           )));
   }
   

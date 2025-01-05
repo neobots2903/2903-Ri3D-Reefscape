@@ -41,9 +41,13 @@ public final class Constants {
   }
 
   public static final class ClimbConstants {
-    public static final int kFrontClimbMotorPort = 0;
-    public static final int kRearClimbMotorPort = 0;
-    public static final int kEngageClimbMotorPort = 0;
+    public static final int kRightClimbMotorPort = 0; // Cim Follower
+    public static final int kLeftClimbMotorPort = 0; // Cim Leader
+    public static final int kEngageClimbMotorPort = 0; // Bag
+
+    // current constants
+    public static final int kClimbCurrentEnabled = 40;
+    public static final int kClimbCurrentDisabled = 0;
 
     // Engage PID
     public static final int kTimeoutMs = 30;

@@ -35,32 +35,45 @@ import frc.robot.Constants.ClimbConstants;
 
 public class ClimbSubsystem extends SubsystemBase {
 
-  private final WPI_TalonSRX m_frontClimb = new WPI_TalonSRX(ClimbConstants.kFrontClimbMotorPort);
-  private final WPI_TalonSRX m_rearClimb = new WPI_TalonSRX(ClimbConstants.kRearClimbMotorPort);
+  private final WPI_TalonSRX m_RightClimb = new WPI_TalonSRX(ClimbConstants.kRightClimbMotorPort);
+  private final WPI_TalonSRX m_LeftClimb = new WPI_TalonSRX(ClimbConstants.kLeftClimbMotorPort);
   private final WPI_TalonSRX m_engageClimb = new WPI_TalonSRX(ClimbConstants.kEngageClimbMotorPort);
 
+  private boolean isEngaged;
 
   public ClimbSubsystem() {
     // Set one climb to follower
-    m_rearClimb.set(TalonSRXControlMode.Follower, ClimbConstants.kFrontClimbMotorPort);
+    m_RightClimb.set(TalonSRXControlMode.Follower, ClimbConstants.kRightClimbMotorPort);
 
     // Set Brake Mode
-    m_rearClimb.setNeutralMode(NeutralMode.Brake);
-    m_frontClimb.setNeutralMode(NeutralMode.Brake);
+    m_RightClimb.setNeutralMode(NeutralMode.Brake);
+    m_LeftClimb.setNeutralMode(NeutralMode.Brake);
 
     // Enable PID Stuff
 		m_engageClimb.config_kP(ClimbConstants.kPIDLoopIdx, ClimbConstants.kP, ClimbConstants.kTimeoutMs);
 		m_engageClimb.config_kI(ClimbConstants.kPIDLoopIdx, ClimbConstants.kI, ClimbConstants.kTimeoutMs);
     m_engageClimb.config_kD(ClimbConstants.kPIDLoopIdx, ClimbConstants.kD, ClimbConstants.kTimeoutMs);
+
+    // Set class attributes
+    isEngaged = false; 
   }
 
   public void setClimbPower(double percentOutput){
-    m_frontClimb.set(TalonSRXControlMode.PercentOutput, percentOutput);
+    m_LeftClimb.set(TalonSRXControlMode.PercentOutput, percentOutput);
   }
 
   // Will need a PID loop in current mode(?) for keeping constant pressure on the cage.
   public void setEngagePower(int ampsOutput){
     m_engageClimb.set(TalonSRXControlMode.Current, ampsOutput); // 40 Amp breaker in PDP
+    this.setEngagedStatus(); //any time this is run re-set the engaged status 
+  }
+
+  public void setEngagedStatus(){//false is disabled, true is enabled
+    isEngaged = !isEngaged;
+  }
+
+  public boolean getEngagedStatus(){
+    return isEngaged;
   }
 
   @Override
