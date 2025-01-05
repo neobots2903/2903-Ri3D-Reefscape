@@ -8,6 +8,8 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ClimbConstants;
@@ -46,8 +48,10 @@ public class ClimbSubsystem extends SubsystemBase {
     m_rearClimb.setNeutralMode(NeutralMode.Brake);
     m_frontClimb.setNeutralMode(NeutralMode.Brake);
 
-    // Enable PID Stuff (example open in browser)
-    // m_engageClimb.
+    // Enable PID Stuff
+		m_engageClimb.config_kP(ClimbConstants.kPIDLoopIdx, ClimbConstants.kP, ClimbConstants.kTimeoutMs);
+		m_engageClimb.config_kI(ClimbConstants.kPIDLoopIdx, ClimbConstants.kI, ClimbConstants.kTimeoutMs);
+    m_engageClimb.config_kD(ClimbConstants.kPIDLoopIdx, ClimbConstants.kD, ClimbConstants.kTimeoutMs);
   }
 
   public void setClimbPower(double percentOutput){
@@ -62,7 +66,9 @@ public class ClimbSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // PRINT PID TELEMETRY!!!
+    SmartDashboard.putNumber("Engage Current Voltage", m_engageClimb.getStatorCurrent());
+    SmartDashboard.putNumber("Engage PID Target", m_engageClimb.getClosedLoopTarget());
+    SmartDashboard.putNumber("Engage PID Error", m_engageClimb.getClosedLoopError(ClimbConstants.kPIDLoopIdx));
   }
 
   @Override
