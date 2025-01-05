@@ -24,6 +24,13 @@ import frc.robot.Constants.ClimbConstants;
   * 1 mini CIM for engage.
   */
 
+// NOTES:
+/*
+ * Could also do position control, but I was thinking that Current would be easier to
+ * work with and less likely to kill motors. Empirically find amps under normal climb, then
+ * use as target current.
+ */
+
 public class ClimbSubsystem extends SubsystemBase {
 
   private final WPI_TalonSRX m_frontClimb = new WPI_TalonSRX(ClimbConstants.kFrontClimbMotorPort);
@@ -43,6 +50,9 @@ public class ClimbSubsystem extends SubsystemBase {
     m_engageClimb.configSelectedFeedbackSensor(	FeedbackDevice.QuadEncoder,	// Local Feedback Source
                                                 0,		            // PID Slot for Source [0, 1]
                                                 Constants.kTimeoutMs);		// Configuration Timeout
+
+    // Enable PID Stuff (example open in browser)
+    // m_engageClimb.
   }
 
   public void setClimbPower(double percentOutput){
@@ -50,13 +60,14 @@ public class ClimbSubsystem extends SubsystemBase {
   }
 
   // Will need a PID loop in current mode(?) for keeping constant pressure on the cage.
-  public void setEngagePower(double percentOutput){
-    m_engageClimb.set(TalonSRXControlMode.PercentOutput, percentOutput);
+  public void setEngagePower(int ampsOutput){
+    m_engageClimb.set(TalonSRXControlMode.Current, ampsOutput); // 40 Amp breaker in PDP
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // PRINT PID TELEMETRY!!!
   }
 
   @Override
