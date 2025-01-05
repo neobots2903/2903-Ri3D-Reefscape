@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
-//import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -14,8 +13,6 @@ import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
-
-import java.util.AbstractSequentialList;
 
 import com.ctre.phoenix.motorcontrol.can.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -120,8 +117,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    double squaredX = Math.copySign(xSpeed * xSpeed, xSpeed);
-    double squaredY = Math.copySign(ySpeed * ySpeed, ySpeed);
+    double squaredX = Math.abs(xSpeed * xSpeed);
+    double squaredY = Math.abs(ySpeed * ySpeed);
 
     if (fieldRelative) {
       m_drive.driveCartesian(squaredX, squaredY, rot, m_gyro.getRotation2d());
@@ -129,14 +126,6 @@ public class DriveSubsystem extends SubsystemBase {
       m_drive.driveCartesian(squaredX, squaredY, rot);
     }
   }
-
-  /** Sets the front left drive MotorController to a voltage. */
-//   public void setDriveMotorControllersVolts(MecanumDriveMotorVoltages volts) {
-//     m_frontLeft.setVoltage(volts.frontLeftVoltage);
-//     m_rearLeft.setVoltage(volts.rearLeftVoltage);
-//     m_frontRight.setVoltage(volts.frontRightVoltage);
-//     m_rearRight.setVoltage(volts.rearRightVoltage);
-//   }
 
   /**
    * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.

@@ -2,8 +2,6 @@ package frc.robot;
 
 import frc.robot.subsystems.*;
 import frc.robot.Constants.OperatorConstants;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj.XboxController;
@@ -11,7 +9,6 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,14 +20,6 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   private final double DEADZONE_THRESH = 0.1;
-  
-  /*command to run shooter then actuate solenoid 
-  * step 1: run shooter wheels
-  * step 2: wait for shooter to reach speed
-  * step 3: actuate solenoid
-  * step 4: wait for note to shoot
-  * step 5: stop shooter wheels and retract solenoid
-  */
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final XboxController m_driverController =
@@ -63,7 +52,7 @@ public class RobotContainer {
                     deadzone(m_driverController.getLeftY()),
                     deadzone(m_driverController.getLeftX()),
                     -deadzone(m_driverController.getRightX()),
-                    true),
+                    false),
             m_driveSubsystem));
 
         // Drive at half speed when the right bumper is held
