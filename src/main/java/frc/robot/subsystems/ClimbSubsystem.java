@@ -7,8 +7,22 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+// TODO:
+/*
+ * Need to find out motor controller type (Spark Max, Talon, Victor SP, Victor SPX).
+ * Find out which encoders the build team will grace us with, if any...
+ */
+
+ // ASSUMPTIONS:
+ /*
+  * Single CIM for climb.
+  * Single BAG for grab.
+  */
+
 public class ClimbSubsystem extends SubsystemBase {
-  public ClimbSubsystem() {}
+  public ClimbSubsystem() {
+    // Some initialization
+  }
 
   /**
    * Example command factory method.
