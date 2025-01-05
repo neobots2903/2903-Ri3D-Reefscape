@@ -41,7 +41,7 @@ public class ClimbSubsystem extends SubsystemBase {
     m_rearClimb.setNeutralMode(NeutralMode.Brake);
     m_frontClimb.setNeutralMode(NeutralMode.Brake);
 
-    /* Configure the left Talon's selected sensor as local QuadEncoder */
+    // Configure the engage Talon's selected sensor as local QuadEncoder
     m_engageClimb.configSelectedFeedbackSensor(	FeedbackDevice.QuadEncoder,	// Local Feedback Source
                                                 0,		            // PID Slot for Source [0, 1]
                                                 Constants.kTimeoutMs);		// Configuration Timeout
