@@ -38,4 +38,23 @@ public final class Constants {
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
   }
+
+  public static final class ClimbConstants {
+    public static final int kClimbLeftMotorPort = 0;  // TODO: Set port!
+    public static final int kClimbRightMotorPort = 0; // TODO: Set port!
+    public static final int kClimbEngageMotorPort = 0; // TODO: Set port!
+  }
+
+  public static final class ArmConstants {
+    public static final int kArmRotateMotorPort = 0; // TODO: Set port!
+    public static final int kArmExtendMotorPort = 0; // TODO: Set port!
+    public static final int kArmIntakeMotorPort = 0; // TODO: Set port!
+
+    public static final int kWristPitchServoPort = 0; // TODO: Set port!
+    public static final int kWristDiffServoPort = 0; // TODO: Set port!
+  }
+
+  public static final class LEDConstants {
+    public static final int kLedDataDigitalPort = 0; // TODO: Set port!
+  }
 }
