@@ -21,6 +21,10 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
   }
 
+  public static class LEDConstants {
+    public static final int kLedDataDigitalPort = 0;
+  }
+
   public static final class DriveConstants {
     public static final int kFrontLeftMotorPort = 15;
     public static final int kRearLeftMotorPort = 13;
@@ -38,6 +42,14 @@ public final class Constants {
             new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+  }
+
+  public static final class ArmConstants {
+    public static final int kArmRotateMotorPort = 0;
+    public static final int kArmExtendMotorPort = 0;
+    public static final int kArmIntakeMotorPort = 0;
+    public static final int kWristPitchServoPort = 0;
+    public static final int kWristDiffServoPort = 0;
   }
 
   public static final class ClimbConstants {
