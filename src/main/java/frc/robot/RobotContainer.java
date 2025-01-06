@@ -79,8 +79,13 @@ public class RobotContainer {
         // X button toggles the climb engagement mechanism. Default false.
     m_operatorController.x()
         .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(
-          m_climbSubsystem.getEngagedStatus() ? ClimbConstants.kClimbCurrentDisabled : ClimbConstants.kClimbCurrentEnabled
+          m_climbSubsystem.getEngagedStatus() ? ClimbConstants.kClimbPercentDisabled : ClimbConstants.kClimbPercentEnabled
           )));
+
+        // B button runs the climb engagement back down.
+        m_operatorController.b()
+        .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(-(ClimbConstants.kClimbPercentEnabled / 2))))
+        .onFalse(new InstantCommand(() -> m_climbSubsystem.setEngagePower(ClimbConstants.kClimbPercentDisabled)));    
 
         // A button to intake
     m_operatorController.a()
