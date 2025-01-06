@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
  */
 
  /*
+ * IF CURRENT CONTROL IS NEEDED ON PINCHER, SWAP TALON FOR VICTOR AND RE-IMPLEMENT IT!!!
   * 7 talon spx (4 drive, 2 arm (extend, rotate), 1 climb (pull up,right))
   * 2 sparkMax (1 intake, 1 climb (pull up,left))
   * 1 victor spx (1 climb (pincher))
@@ -56,15 +57,11 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
-    public static final int kArmRotateMotorPort = 0;
-    public static final int kArmExtendMotorPort = 0;
-    public static final int kArmIntakeMotorPort = 0;
+    public static final int kArmRotateMotorPort = 0; // Cim + Talon
+    public static final int kArmExtendMotorPort = 0; // Bag + Talon
+    public static final int kArmIntakeMotorPort = 0; // Neo 550 + Spark
     public static final int kWristPitchServoPort = 0;
     public static final int kWristDiffServoPort = 0;
-
-    public static final int kArmFeedforward_S = 0;
-    public static final int kArmFeedforward_V = 0;
-    public static final int kArmFeedforward_G = 0;
 
     // Engage PID
     public static final int kPIDLoopIdx = 0;
@@ -100,19 +97,12 @@ public final class Constants {
   }
 
   public static final class ClimbConstants {
-    public static final int kRightClimbMotorPort = 0; // Cim Follower
-    public static final int kLeftClimbMotorPort = 0; // Cim Leader
-    public static final int kEngageClimbMotorPort = 0; // Bag
+    public static final int kRightClimbMotorPort = 0; // Cim + Talon
+    public static final int kLeftClimbMotorPort = 0; // Cim + Spark
+    public static final int kEngageClimbMotorPort = 0; // Bag + Victor
 
     // current constants
     public static final double kClimbPercentEnabled = 0.6;
     public static final double kClimbPercentDisabled = 0.0;
-
-    // Engage PID
-    public static final int kPIDLoopIdx = 0;
-    public static final double kP = 0;
-    public static final double kI = 0;
-    public static final double kD = 0;
-    public static final double kF = 0;
   }
 }
