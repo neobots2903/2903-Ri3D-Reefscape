@@ -10,14 +10,14 @@ import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ClimbConstants;
 
 // TODO:
@@ -40,12 +40,9 @@ import frc.robot.Constants.ClimbConstants;
  */
 
 public class ClimbSubsystem extends SubsystemBase {
-
-  //SWAP RIGHT AND LEFT TO VICTORS IF NEEDED 
   private final WPI_TalonSRX m_RightClimb = new WPI_TalonSRX(ClimbConstants.kRightClimbMotorPort);
-  private final  SparkMax m_LeftClimb = new SparkMax(ClimbConstants.kLeftClimbMotorPort, MotorType.kBrushed);
-  SparkMaxConfig config_ = new SparkMaxConfig();
   private final VictorSPX m_engageClimb = new VictorSPX(ClimbConstants.kEngageClimbMotorPort);
+  private final VictorSP m_LeftClimb = new VictorSP(0);
 
   private boolean isEngaged;
 
@@ -54,8 +51,7 @@ public class ClimbSubsystem extends SubsystemBase {
     // Set Brake Mode
     m_RightClimb.setNeutralMode(NeutralMode.Brake);
 
-    config_.idleMode(SparkBaseConfig.IdleMode.kBrake);
-    m_LeftClimb.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    m_LeftClimb.setInverted(true);
 
     // Set class attributes
     isEngaged = false; 

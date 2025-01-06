@@ -38,10 +38,10 @@ public final class Constants {
   }
 
   public static final class DriveConstants {
-    public static final int kFrontLeftMotorPort = 15;
-    public static final int kRearLeftMotorPort = 13;
-    public static final int kFrontRightMotorPort = 12;
-    public static final int kRearRightMotorPort = 14;
+    public static final int kFrontLeftMotorPort = 14;
+    public static final int kRearLeftMotorPort = 12;
+    public static final int kFrontRightMotorPort = 13;
+    public static final int kRearRightMotorPort = 15;
 
     public static final double kTrackWidth = 0.5; // 0.5 what?
     // Distance between centers of right and left wheels on robot
@@ -59,7 +59,7 @@ public final class Constants {
   public static final class ArmConstants {
     public static final int kArmRotateMotorPort = 0; // Cim + Talon
     public static final int kArmExtendMotorPort = 0; // Bag + Talon
-    public static final int kArmIntakeMotorPort = 0; // Neo 550 + Spark
+    public static final int kArmIntakeMotorPort = 20; // Neo 550 + Spark
     public static final int kWristPitchServoPort = 0;
     public static final int kWristDiffServoPort = 0;
 
@@ -97,12 +97,12 @@ public final class Constants {
   }
 
   public static final class ClimbConstants {
-    public static final int kRightClimbMotorPort = 0; // Cim + Talon
-    public static final int kLeftClimbMotorPort = 0; // Cim + Spark
-    public static final int kEngageClimbMotorPort = 0; // Bag + Victor
+    public static final int kRightClimbMotorPort = 11; // Cim + Talon
+    public static final int kLeftClimbMotorPort = 17; // Cim + Spark
+    public static final int kEngageClimbMotorPort = 16; // Bag + Victor
 
     // current constants
-    public static final double kClimbPercentEnabled = 0.6;
+    public static final double kClimbPercentEnabled = 0.2;
     public static final double kClimbPercentDisabled = 0.0;
   }
 }

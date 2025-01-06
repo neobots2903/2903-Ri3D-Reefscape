@@ -1,8 +1,6 @@
 package frc.robot;
 
 import frc.robot.subsystems.*;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.ArmPositions;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -20,7 +18,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
-  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  //private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
 
   private final double DEADZONE_THRESH = 0.1;
 
@@ -88,41 +86,41 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> m_climbSubsystem.setEngagePower(ClimbConstants.kClimbPercentDisabled)));    
 
         // A button to intake
-    m_operatorController.a()
-        .whileTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(ArmConstants.kIntakeSpeed)));
+  //   m_operatorController.a()
+  //       .whileTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(ArmConstants.kIntakeSpeed)));
     
-        // B button to spit out
-    m_operatorController.b()
-        .whileTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(-ArmConstants.kIntakeSpeed)));
+  //       // B button to spit out
+  //   m_operatorController.b()
+  //       .whileTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(-ArmConstants.kIntakeSpeed)));
 
-        // Left D-Pad to reach Coral L1
-    m_operatorController.povLeft()
-        .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralOne)));
+  //       // Left D-Pad to reach Coral L1
+  //   m_operatorController.povLeft()
+  //       .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralOne)));
 
-        // Up D-Pad to reach Coral L2
-    m_operatorController.povUp()
-    .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralTwo)));
+  //       // Up D-Pad to reach Coral L2
+  //   m_operatorController.povUp()
+  //   .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralTwo)));
 
-        // Right D-Pad to reach Coral L3
-    m_operatorController.povRight()
-    .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralThree)));
+  //       // Right D-Pad to reach Coral L3
+  //   m_operatorController.povRight()
+  //   .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralThree)));
 
-        // Down D-Pad to reach Coral L4
-    m_operatorController.povDown()
-    .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralFour)));
+  //       // Down D-Pad to reach Coral L4
+  //   m_operatorController.povDown()
+  //   .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralFour)));
 
-        //back to reach ground position
-    m_operatorController.back()
-      .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateGroundPos)));
+  //       //back to reach ground position
+  //   m_operatorController.back()
+  //     .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateGroundPos)));
 
-        // LB to retract arm
-    m_operatorController.leftBumper()
-    .onTrue(new InstantCommand(() -> m_armSubsystem.SetExtensionPos(ArmPositions.kExtendInPos)));
+  //       // LB to retract arm
+  //   m_operatorController.leftBumper()
+  //   .onTrue(new InstantCommand(() -> m_armSubsystem.SetExtensionPos(ArmPositions.kExtendInPos)));
 
-        // RB to retract arm
-    m_operatorController.rightBumper()
-    .onTrue(new InstantCommand(() -> m_armSubsystem.SetExtensionPos(ArmPositions.kExtendOutPos)));
-  }
+  //       // RB to retract arm
+  //   m_operatorController.rightBumper()
+  //   .onTrue(new InstantCommand(() -> m_armSubsystem.SetExtensionPos(ArmPositions.kExtendOutPos)));
+   }
   
   private double deadzone(double val) {
     return (Math.abs(val) > DEADZONE_THRESH) ? val : 0;

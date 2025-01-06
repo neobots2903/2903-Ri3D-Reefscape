@@ -118,8 +118,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    double squaredX = Math.abs(xSpeed * xSpeed);
-    double squaredY = Math.abs(ySpeed * ySpeed);
+    double squaredX = Math.copySign(xSpeed * xSpeed, xSpeed);
+    double squaredY = Math.copySign(ySpeed * ySpeed, ySpeed);
 
     if (fieldRelative) {
       m_drive.driveCartesian(squaredX, squaredY, rot, m_gyro.getRotation2d());
