@@ -53,6 +53,7 @@ public class ClimbSubsystem extends SubsystemBase {
 		m_engageClimb.config_kP(ClimbConstants.kPIDLoopIdx, ClimbConstants.kP, ClimbConstants.kTimeoutMs);
 		m_engageClimb.config_kI(ClimbConstants.kPIDLoopIdx, ClimbConstants.kI, ClimbConstants.kTimeoutMs);
     m_engageClimb.config_kD(ClimbConstants.kPIDLoopIdx, ClimbConstants.kD, ClimbConstants.kTimeoutMs);
+    m_engageClimb.config_kF(ClimbConstants.kPIDLoopIdx, ClimbConstants.kF, ClimbConstants.kTimeoutMs);
 
     // Set class attributes
     isEngaged = false; 
