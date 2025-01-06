@@ -4,10 +4,16 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,36 +43,31 @@ public class ClimbSubsystem extends SubsystemBase {
 
   //SWAP RIGHT AND LEFT TO VICTORS IF NEEDED 
   private final WPI_TalonSRX m_RightClimb = new WPI_TalonSRX(ClimbConstants.kRightClimbMotorPort);
-  private final WPI_TalonSRX m_LeftClimb = new WPI_TalonSRX(ClimbConstants.kLeftClimbMotorPort);
-  private final WPI_TalonSRX m_engageClimb = new WPI_TalonSRX(ClimbConstants.kEngageClimbMotorPort);
+  private final  SparkMax m_LeftClimb = new SparkMax(ClimbConstants.kLeftClimbMotorPort, MotorType.kBrushed);
+  SparkMaxConfig config_ = new SparkMaxConfig();
+  private final VictorSPX m_engageClimb = new VictorSPX(ClimbConstants.kEngageClimbMotorPort);
 
   private boolean isEngaged;
 
   public ClimbSubsystem() {
-    // Set one climb to follower
-    m_RightClimb.set(TalonSRXControlMode.Follower, ClimbConstants.kRightClimbMotorPort);
 
     // Set Brake Mode
     m_RightClimb.setNeutralMode(NeutralMode.Brake);
-    m_LeftClimb.setNeutralMode(NeutralMode.Brake);
 
-    // Enable PID Stuff
-		m_engageClimb.config_kP(ClimbConstants.kPIDLoopIdx, ClimbConstants.kP, Constants.kTimeoutMs);
-		m_engageClimb.config_kI(ClimbConstants.kPIDLoopIdx, ClimbConstants.kI, Constants.kTimeoutMs);
-    m_engageClimb.config_kD(ClimbConstants.kPIDLoopIdx, ClimbConstants.kD, Constants.kTimeoutMs);
-    m_engageClimb.config_kF(ClimbConstants.kPIDLoopIdx, ClimbConstants.kF, Constants.kTimeoutMs);
+    config_.idleMode(SparkBaseConfig.IdleMode.kBrake);
+    m_LeftClimb.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
 
     // Set class attributes
     isEngaged = false; 
   }
 
   public void setClimbPower(double percentOutput){
-    m_LeftClimb.set(TalonSRXControlMode.PercentOutput, percentOutput);
+    m_LeftClimb.set(percentOutput);
+    m_RightClimb.set(TalonSRXControlMode.PercentOutput, percentOutput);
   }
 
-  // Will need a PID loop in current mode(?) for keeping constant pressure on the cage.
-  public void setEngagePower(int ampsOutput){
-    m_engageClimb.set(TalonSRXControlMode.Current, ampsOutput); // 40 Amp breaker in PDP
+  public void setEngagePower(double percentOutput){
+    m_engageClimb.set(VictorSPXControlMode.PercentOutput, percentOutput); // 40 Amp breaker in PDP
     this.setEngagedStatus(); //any time this is run re-set the engaged status 
   }
 
@@ -81,9 +82,6 @@ public class ClimbSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Engage Current Voltage", m_engageClimb.getStatorCurrent());
-    SmartDashboard.putNumber("Engage PID Target", m_engageClimb.getClosedLoopTarget());
-    SmartDashboard.putNumber("Engage PID Error", m_engageClimb.getClosedLoopError(ClimbConstants.kPIDLoopIdx));
   }
 
   @Override

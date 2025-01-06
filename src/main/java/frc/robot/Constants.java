@@ -17,9 +17,8 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
  */
 
  /*
- * NEED TO DEFINE: 2 climb (pull up)
-  * 7 talon spx (4 drive, 2 arm (extend, rotate))
-  * 2 sparkMax (1 intake)
+  * 7 talon spx (4 drive, 2 arm (extend, rotate), 1 climb (pull up,right))
+  * 2 sparkMax (1 intake, 1 climb (pull up,left))
   * 1 victor spx (1 climb (pincher))
   * 2 victor sp
  */
@@ -106,8 +105,8 @@ public final class Constants {
     public static final int kEngageClimbMotorPort = 0; // Bag
 
     // current constants
-    public static final int kClimbCurrentEnabled = 40;
-    public static final int kClimbCurrentDisabled = 0;
+    public static final double kClimbPercentEnabled = 0.6;
+    public static final double kClimbPercentDisabled = 0.0;
 
     // Engage PID
     public static final int kPIDLoopIdx = 0;
