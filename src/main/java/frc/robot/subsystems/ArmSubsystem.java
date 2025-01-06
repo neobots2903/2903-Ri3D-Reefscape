@@ -9,6 +9,9 @@ import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 
 import com.revrobotics.spark.SparkMax;
+
+import java.nio.channels.WritableByteChannel;
+
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
@@ -24,9 +27,9 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMax m_armIntake = new SparkMax(ArmConstants.kArmIntakeMotorPort, MotorType.kBrushless);
 
   // Only rotates the wrist's pitch
-  //private final Servo m_wristPitch = new Servo(ArmConstants.kWristPitchServoPort);
+  private final Servo m_wristPitch = new Servo(ArmConstants.kWristPitchServoPort);
   // Rotates the wrist's pitch and roll equally
-  //private final Servo m_wristDiff = new Servo(ArmConstants.kWristDiffServoPort);
+  private final Servo m_wristDiff = new Servo(ArmConstants.kWristDiffServoPort);
 
   // WristDiff revolutions per wirstPitch revolution
   private final double wristDiffRatio = 1.0/3.0;
@@ -70,21 +73,21 @@ public class ArmSubsystem extends SubsystemBase {
     return currentRoll;
   }
 
-  // public void SetWristPitch(double pitch) {
-  //   SetWristPosition(pitch, currentRoll);
-  // }
+  public void SetWristPitch(double pitch) {
+    SetWristPosition(pitch, currentRoll);
+  }
 
-  // public void SetWristRoll(double roll) {
-  //   SetWristPosition(currentPitch, roll);
-  // }
+  public void SetWristRoll(double roll) {
+    SetWristPosition(currentPitch, roll);
+  }
 
   /* Sets wrist pitch and roll positions from 0.0 to 1.0. */
-  // public void SetWristPosition(double pitch, double roll) {
-  //   m_wristPitch.set(roll * wristDiffRatio - pitch);
-  //   m_wristDiff.set(roll);
-  //   currentPitch = pitch;
-  //   currentRoll = roll;
-  // }
+  public void SetWristPosition(double pitch, double roll) {
+    m_wristPitch.set(roll * wristDiffRatio - (pitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio);
+    m_wristDiff.set(roll);
+    currentPitch = pitch;
+    currentRoll = roll;
+  }
 
   public void SetExtensionPos(double setPos){
     m_armExtend.set(TalonSRXControlMode.Position, setPos);
