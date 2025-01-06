@@ -35,6 +35,7 @@ import frc.robot.Constants.ClimbConstants;
 
 public class ClimbSubsystem extends SubsystemBase {
 
+  //SWAP RIGHT AND LEFT TO VICTORS IF NEEDED 
   private final WPI_TalonSRX m_RightClimb = new WPI_TalonSRX(ClimbConstants.kRightClimbMotorPort);
   private final WPI_TalonSRX m_LeftClimb = new WPI_TalonSRX(ClimbConstants.kLeftClimbMotorPort);
   private final WPI_TalonSRX m_engageClimb = new WPI_TalonSRX(ClimbConstants.kEngageClimbMotorPort);
@@ -50,10 +51,10 @@ public class ClimbSubsystem extends SubsystemBase {
     m_LeftClimb.setNeutralMode(NeutralMode.Brake);
 
     // Enable PID Stuff
-		m_engageClimb.config_kP(ClimbConstants.kPIDLoopIdx, ClimbConstants.kP, ClimbConstants.kTimeoutMs);
-		m_engageClimb.config_kI(ClimbConstants.kPIDLoopIdx, ClimbConstants.kI, ClimbConstants.kTimeoutMs);
-    m_engageClimb.config_kD(ClimbConstants.kPIDLoopIdx, ClimbConstants.kD, ClimbConstants.kTimeoutMs);
-    m_engageClimb.config_kF(ClimbConstants.kPIDLoopIdx, ClimbConstants.kF, ClimbConstants.kTimeoutMs);
+		m_engageClimb.config_kP(ClimbConstants.kPIDLoopIdx, ClimbConstants.kP, Constants.kTimeoutMs);
+		m_engageClimb.config_kI(ClimbConstants.kPIDLoopIdx, ClimbConstants.kI, Constants.kTimeoutMs);
+    m_engageClimb.config_kD(ClimbConstants.kPIDLoopIdx, ClimbConstants.kD, Constants.kTimeoutMs);
+    m_engageClimb.config_kF(ClimbConstants.kPIDLoopIdx, ClimbConstants.kF, Constants.kTimeoutMs);
 
     // Set class attributes
     isEngaged = false; 

@@ -1,6 +1,8 @@
 package frc.robot;
 
 import frc.robot.subsystems.*;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ArmPositions;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -21,14 +23,16 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+
   private final double DEADZONE_THRESH = 0.1;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final XboxController m_driverController =
-      new XboxController(OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController m_driverController =
+      new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
-  private final XboxController m_operatorController = 
-      new XboxController(OperatorConstants.kOperatorControllerPort);
+  private final CommandXboxController m_operatorController = 
+      new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -64,23 +68,58 @@ public class RobotContainer {
     //DRIVER CONTROLLER
 
         // Drive at half speed when the right bumper is held
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .onTrue(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(0.5)))
-        .onFalse(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(1)));
-  
+    m_driverController.rightBumper()
+      .onTrue(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(0.5)))
+      .onFalse(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(1)));
 
     //OPERATOR CONTROLLER
 
         // Climb up cage when Y is held
-    new JoystickButton(m_operatorController, Button.kY.value)
+    m_operatorController.y()
         .onTrue(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0.85)))
         .onFalse(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0)));
 
         // X button toggles the climb engagement mechanism. Default false.
-    new JoystickButton(m_operatorController, Button.kX.value)
+    m_operatorController.x()
         .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(
           m_climbSubsystem.getEngagedStatus() ? ClimbConstants.kClimbCurrentDisabled : ClimbConstants.kClimbCurrentEnabled
           )));
+
+        // A button to intake
+    m_operatorController.a()
+        .whileTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(ArmConstants.kIntakeSpeed)));
+    
+        // B button to spit out
+    m_operatorController.b()
+        .whileTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(-ArmConstants.kIntakeSpeed)));
+
+        // Left D-Pad to reach Coral L1
+    m_operatorController.povLeft()
+        .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralOne)));
+
+        // Up D-Pad to reach Coral L2
+    m_operatorController.povUp()
+    .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralTwo)));
+
+        // Right D-Pad to reach Coral L3
+    m_operatorController.povRight()
+    .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralThree)));
+
+        // Down D-Pad to reach Coral L4
+    m_operatorController.povDown()
+    .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateCoralFour)));
+
+        //back to reach ground position
+    m_operatorController.back()
+      .onTrue(new InstantCommand(() -> m_armSubsystem.SetRotationPos(ArmPositions.kRotateGroundPos)));
+
+        // LB to retract arm
+    m_operatorController.leftBumper()
+    .onTrue(new InstantCommand(() -> m_armSubsystem.SetExtensionPos(ArmPositions.kExtendInPos)));
+
+        // RB to retract arm
+    m_operatorController.rightBumper()
+    .onTrue(new InstantCommand(() -> m_armSubsystem.SetExtensionPos(ArmPositions.kExtendOutPos)));
   }
   
   private double deadzone(double val) {

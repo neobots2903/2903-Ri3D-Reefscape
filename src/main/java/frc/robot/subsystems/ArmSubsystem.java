@@ -5,12 +5,16 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Servo;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 
-import com.ctre.phoenix.motorcontrol.can.*;
 import com.revrobotics.spark.SparkMax;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -33,6 +37,29 @@ public class ArmSubsystem extends SubsystemBase {
 
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
+
+    m_armRotate.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 
+                                            ArmConstants.kPIDLoopIdx,
+				                            Constants.kTimeoutMs);
+    m_armExtend.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 
+                                    ArmConstants.kPIDLoopIdx,
+                            Constants.kTimeoutMs);
+
+      // Set Brake Mode
+    m_armExtend.setNeutralMode(NeutralMode.Brake);
+    m_armRotate.setNeutralMode(NeutralMode.Brake);
+
+    // Enable Extention PID Stuff
+		m_armExtend.config_kP(ArmConstants.kPIDLoopIdx, ArmConstants.kExtendP, Constants.kTimeoutMs);
+		m_armExtend.config_kI(ArmConstants.kPIDLoopIdx, ArmConstants.kExtendI, Constants.kTimeoutMs);
+    m_armExtend.config_kD(ArmConstants.kPIDLoopIdx, ArmConstants.kExtendD, Constants.kTimeoutMs);
+    m_armExtend.config_kF(ArmConstants.kPIDLoopIdx, ArmConstants.kExtendF, Constants.kTimeoutMs);
+
+    // Enable Rotate PID Stuff
+		m_armRotate.config_kP(ArmConstants.kPIDLoopIdx, ArmConstants.kRotateP, Constants.kTimeoutMs);
+		m_armRotate.config_kI(ArmConstants.kPIDLoopIdx, ArmConstants.kRotateI, Constants.kTimeoutMs);
+    m_armRotate.config_kD(ArmConstants.kPIDLoopIdx, ArmConstants.kRotateD, Constants.kTimeoutMs);
+    m_armRotate.config_kF(ArmConstants.kPIDLoopIdx, ArmConstants.kRotateF, Constants.kTimeoutMs);
   }
 
   public double GetWristPitch() {
@@ -59,8 +86,21 @@ public class ArmSubsystem extends SubsystemBase {
     currentRoll = roll;
   }
 
+  public void SetExtensionPos(double setPos){
+    m_armExtend.set(TalonSRXControlMode.Position, setPos);
+  }
+
+  public void SetRotationPos(double setPos) {
+    m_armRotate.set(TalonSRXControlMode.Position, setPos);
+  }
+
+  public void SetIntakeSpeed(double speed) {
+    m_armIntake.set(speed);
+  }
+
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
+    SmartDashboard.putNumber("Arm Extension Encoder Ticks", m_armExtend.getSelectedSensorPosition());
   }
 }

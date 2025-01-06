@@ -15,7 +15,18 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
+
+ /*
+  * 7 talon spx (4 drive, 3 climb)
+  * 2 sparkMax (1 intake, 1 arm)
+  * 1 victor spx (1 arm)
+  * 2 victor sp
+ */
+
 public final class Constants {
+
+  public static final int kTimeoutMs = 30;
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
@@ -50,6 +61,42 @@ public final class Constants {
     public static final int kArmIntakeMotorPort = 0;
     public static final int kWristPitchServoPort = 0;
     public static final int kWristDiffServoPort = 0;
+
+    public static final int kArmFeedforward_S = 0;
+    public static final int kArmFeedforward_V = 0;
+    public static final int kArmFeedforward_G = 0;
+
+    // Engage PID
+    public static final int kPIDLoopIdx = 0;
+
+    //Extention PID 
+    public static final double kExtendP = 0;
+    public static final double kExtendI = 0;
+    public static final double kExtendD = 0;
+    public static final double kExtendF = 0;
+
+    //Rotation PID 
+    public static final double kRotateP = 0;
+    public static final double kRotateI = 0;
+    public static final double kRotateD = 0;
+    public static final double kRotateF = 0;
+
+    //Encoder 
+    public final static int kSensorUnitsPerRotation = 4096;
+
+    // Intake
+    public final static double kIntakeSpeed = 0.8;
+  }
+
+  public static final class ArmPositions {
+    public static final int kExtendInPos = 0; // FIND REAL VALUES
+    public static final int kExtendOutPos = 5;
+
+    public static final int kRotateGroundPos = 0;
+    public static final int kRotateCoralOne = 5;
+    public static final int kRotateCoralTwo = 10;
+    public static final int kRotateCoralThree = 15;
+    public static final int kRotateCoralFour = 20;
   }
 
   public static final class ClimbConstants {
@@ -62,7 +109,6 @@ public final class Constants {
     public static final int kClimbCurrentDisabled = 0;
 
     // Engage PID
-    public static final int kTimeoutMs = 30;
     public static final int kPIDLoopIdx = 0;
     public static final double kP = 0;
     public static final double kI = 0;
