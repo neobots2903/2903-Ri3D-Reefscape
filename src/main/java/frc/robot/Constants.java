@@ -17,9 +17,10 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
  */
 
  /*
-  * 7 talon spx (4 drive, 3 climb)
-  * 2 sparkMax (1 intake, 1 arm)
-  * 1 victor spx (1 arm)
+ * NEED TO DEFINE: 2 climb (pull up)
+  * 7 talon spx (4 drive, 2 arm (extend, rotate))
+  * 2 sparkMax (1 intake)
+  * 1 victor spx (1 climb (pincher))
   * 2 victor sp
  */
 
