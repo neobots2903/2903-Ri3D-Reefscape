@@ -24,6 +24,16 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
   * 2 victor sp
  */
 
+ /* TODO
+  * 1. Verify Mapping
+  * 2. Tune arm (extend, rotate) PID loops
+  * 4. Measure and set arm positions (rotation + extension)
+  * 5. Wrist control
+  * 6. Redo control scheme, too many buttons
+  * 7. LEDs
+  * 8. Vision?
+  */
+
 public final class Constants {
 
   public static final int kTimeoutMs = 30;
