@@ -83,6 +83,9 @@ public final class Constants {
 
     // Intake
     public final static double kIntakeSpeed = 0.8;
+
+    // Wrist
+    public final static double kWristSpeed = 0.01;
   }
 
   public static final class ArmPositions {

@@ -65,6 +65,17 @@ public class ArmSubsystem extends SubsystemBase {
     m_armRotate.config_kF(ArmConstants.kPIDLoopIdx, ArmConstants.kRotateF, Constants.kTimeoutMs);
   }
 
+  /**
+   * Returns the total current draw of the arm subsystem.
+   *
+   * @return The arm motors' total current draw (in amps).
+   */
+  public double getCurrentDraw() {
+    return m_armRotate.getStatorCurrent() +
+        m_armExtend.getStatorCurrent() +
+        m_armIntake.getOutputCurrent();
+  }
+
   public double GetWristPitch() {
     return currentPitch;
   }
@@ -83,6 +94,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   /* Sets wrist pitch and roll positions from 0.0 to 1.0. */
   public void SetWristPosition(double pitch, double roll) {
+    pitch = Math.max(Math.min(pitch, 1), 0);
+    roll = Math.max(Math.min(roll, 1), 0);
     m_wristPitch.set(roll * wristDiffRatio - (pitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio);
     m_wristDiff.set(roll);
     currentPitch = pitch;

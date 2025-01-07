@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.subsystems.*;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -18,7 +19,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
-  //private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
 
   private final double DEADZONE_THRESH = 0.1;
 
@@ -62,28 +63,34 @@ public class RobotContainer {
             
     //DRIVER CONTROLLER
 
-        // Drive at half speed when the right bumper is held
+    // Drive at half speed when the right bumper is held
     m_driverController.rightBumper()
       .onTrue(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(0.5)))
       .onFalse(new InstantCommand(() -> m_driveSubsystem.setMaxOutput(1)));
 
     //OPERATOR CONTROLLER
 
-        // Climb up cage when Y is held
+    // Climb up cage when Y is held
     m_operatorController.y()
         .onTrue(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0.85)))
         .onFalse(new InstantCommand(() -> m_climbSubsystem.setClimbPower(0)));
 
-        // X button toggles the climb engagement mechanism. Default false.
+    // X button toggles the climb engagement mechanism. Default false.
     m_operatorController.x()
         .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(
           m_climbSubsystem.getEngagedStatus() ? ClimbConstants.kClimbPercentDisabled : ClimbConstants.kClimbPercentEnabled
           )));
 
-        // B button runs the climb engagement back down.
-        m_operatorController.b()
+    // B button runs the climb engagement back down.
+    m_operatorController.b()
         .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(-(ClimbConstants.kClimbPercentEnabled))))
         .onFalse(new InstantCommand(() -> m_climbSubsystem.setEngagePower(ClimbConstants.kClimbPercentDisabled)));    
+
+    m_operatorController.leftStick().onChange(new InstantCommand(() -> {
+      double rollOffset = m_operatorController.getLeftX() * ArmConstants.kWristSpeed;
+      double pitchOffset = m_operatorController.getLeftY() * ArmConstants.kWristSpeed;
+      m_armSubsystem.SetWristPosition(m_armSubsystem.GetWristPitch() + pitchOffset, m_armSubsystem.GetWristRoll() + rollOffset);
+    }));
 
         // A button to intake
   //   m_operatorController.a()

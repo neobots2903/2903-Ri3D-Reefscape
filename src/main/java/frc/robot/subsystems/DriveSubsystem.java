@@ -101,6 +101,18 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Returns the total current draw of the drive subsystem.
+   *
+   * @return The drive motors' total current draw (in amps).
+   */
+  public double getCurrentDraw() {
+    return m_frontLeft.getStatorCurrent() +
+        m_frontRight.getStatorCurrent() +
+        m_rearLeft.getStatorCurrent() +
+        m_rearRight.getStatorCurrent();
+  }
+
+  /**
    * Returns the currently-estimated pose of the robot.
    *
    * @return The pose.
