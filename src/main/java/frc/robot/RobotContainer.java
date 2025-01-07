@@ -106,11 +106,11 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(-(ClimbConstants.kClimbPercentEnabled))))
         .onFalse(new InstantCommand(() -> m_climbSubsystem.setEngagePower(ClimbConstants.kClimbPercentDisabled)));    
 
-    m_operatorController.leftStick().onChange(new InstantCommand(() -> {
-      double rollOffset = m_operatorController.getLeftX() * ArmConstants.kWristSpeed;
-      double pitchOffset = m_operatorController.getLeftY() * ArmConstants.kWristSpeed;
-      m_armSubsystem.SetWristPosition(m_armSubsystem.GetWristPitch() + pitchOffset, m_armSubsystem.GetWristRoll() + rollOffset);
-    }));
+    // m_operatorController.leftStick().onChange(new InstantCommand(() -> {
+    //   double rollOffset = m_operatorController.getLeftX() * ArmConstants.kWristSpeed;
+    //   double pitchOffset = m_operatorController.getLeftY() * ArmConstants.kWristSpeed;
+    //   m_armSubsystem.SetWristPosition(m_armSubsystem.GetWristPitch() + pitchOffset, m_armSubsystem.GetWristRoll() + rollOffset);
+    // }));
 
         // A button to intake
     m_operatorController.a()

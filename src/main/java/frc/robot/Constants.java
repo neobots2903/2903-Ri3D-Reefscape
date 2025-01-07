@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import frc.robot.subsystems.ArmSubsystem;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -72,8 +73,8 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
-    public static final int kArmRotateMotorPort = 0; // Cim + Talon
-    public static final int kArmExtendMotorPort = 0; // Bag + Talon
+    public static final int kArmRotateMotorPort = 37; // Cim + Talon
+    public static final int kArmExtendMotorPort = 10; // Bag + Talon
     public static final int kArmIntakeMotorPort = 20; // Neo 550 + Spark
     public static final int kWristPitchServoPort = 0;
     public static final int kWristDiffServoPort = 0;
@@ -88,10 +89,10 @@ public final class Constants {
     public static final double kExtendF = 0;
 
     //Rotation PID 
-    public static final double kRotateP = 0;
+    public static final double kRotateP = 0.8;
     public static final double kRotateI = 0;
     public static final double kRotateD = 0;
-    public static final double kRotateF = 0;
+    public static final double kRotateGravityScalar = 0.125;
 
     // The lower bound of expected total current draw (in amps)
     public static final double kMinCurrentDraw = 1;
@@ -99,7 +100,7 @@ public final class Constants {
     public static final double kMaxCurrentDraw = 30;
 
     //Encoder 
-    public final static int kSensorUnitsPerRotation = 4096;
+    public final static int kSensorUnitsPerRotation = 4096 * 2; // 2:1 on output shaft
 
     // Intake
     public final static double kIntakeSpeed = 0.8;
@@ -109,20 +110,22 @@ public final class Constants {
   }
 
   public static final class ArmPositions {
+    public final static double kArmRestingDegrees = -45.0;
+
     public static final int kExtendInPos = 0; // FIND REAL VALUES
     public static final int kExtendOutPos = 5;
 
-    public static final int kRotateGroundPos = 0;
-    public static final int kRotateCoralOne = 5;
-    public static final int kRotateCoralTwo = 10;
-    public static final int kRotateCoralThree = 15;
-    public static final int kRotateCoralFour = 20;
+    public static final int kRotateGroundPos = (int)ArmSubsystem.angleDegreesToTicks(-45 - kArmRestingDegrees);
+    public static final int kRotateCoralOne = (int)ArmSubsystem.angleDegreesToTicks(-30 - kArmRestingDegrees);
+    public static final int kRotateCoralTwo = (int)ArmSubsystem.angleDegreesToTicks(0 - kArmRestingDegrees);
+    public static final int kRotateCoralThree = (int)ArmSubsystem.angleDegreesToTicks(30 - kArmRestingDegrees);
+    public static final int kRotateCoralFour = (int)ArmSubsystem.angleDegreesToTicks(45 - kArmRestingDegrees);
   }
 
   public static final class ClimbConstants {
     public static final int kRightClimbMotorPort = 11; // Cim + Talon
-    public static final int kLeftClimbMotorPort = 17; // Cim + Spark
-    public static final int kEngageClimbMotorPort = 16; // Bag + Victor
+    public static final int kLeftClimbMotorPort = 0; // Cim + Victor SP
+    public static final int kEngageClimbMotorPort = 16; // Bag + Victor SPX
 
     // current constants
     public static final double kClimbPercentEnabled = 0.2;
