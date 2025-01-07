@@ -65,6 +65,12 @@ public class ArmSubsystem extends SubsystemBase {
     m_armRotate.config_kF(ArmConstants.kPIDLoopIdx, ArmConstants.kRotateF, Constants.kTimeoutMs);
   }
 
+  public void cancelPid() {
+    m_armExtend.stopMotor();
+    m_armRotate.stopMotor();
+    // Does this work?
+  }
+
   /**
    * Returns the total current draw of the arm subsystem.
    *
