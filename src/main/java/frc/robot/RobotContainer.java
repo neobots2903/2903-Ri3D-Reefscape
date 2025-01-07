@@ -82,7 +82,7 @@ public class RobotContainer {
 
         // B button runs the climb engagement back down.
         m_operatorController.b()
-        .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(-(ClimbConstants.kClimbPercentEnabled / 2))))
+        .onTrue(new InstantCommand(() -> m_climbSubsystem.setEngagePower(-(ClimbConstants.kClimbPercentEnabled))))
         .onFalse(new InstantCommand(() -> m_climbSubsystem.setEngagePower(ClimbConstants.kClimbPercentDisabled)));    
 
         // A button to intake

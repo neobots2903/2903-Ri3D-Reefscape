@@ -60,6 +60,7 @@ public class DriveSubsystem extends SubsystemBase {
     // gearbox is constructed, you might have to invert the left side instead.
     m_frontRight.setInverted(true);
     m_rearRight.setInverted(true);
+    m_rearLeft.setInverted(true); // Wires backwards.
     // Initialize accel-based location estimation
     resetAccelDistance();
     SmartDashboard.putBoolean("Reset Accel Data", false);
