@@ -4,8 +4,10 @@ import frc.robot.subsystems.*;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmPositions;
 import frc.robot.Constants.ClimbConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -53,14 +55,31 @@ public class RobotContainer {
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
         new RunCommand(
-            () ->
+            () -> {
                 m_driveSubsystem.drive(
                     deadzone(m_driverController.getLeftY()),
                     deadzone(m_driverController.getLeftX()),
                     -deadzone(m_driverController.getRightX()),
-                    false),
-            m_driveSubsystem));
+                    false);
 
+                // Adjust drive rumble based on motor current draw
+                double driveRumble = 
+                    Math.max(m_driveSubsystem.getCurrentDraw() - DriveConstants.kMinCurrentDraw, 0)
+                    / (DriveConstants.kMaxCurrentDraw - DriveConstants.kMinCurrentDraw);
+                m_driverController.setRumble(RumbleType.kBothRumble, driveRumble);
+                  },
+            m_driveSubsystem));
+            
+    m_armSubsystem.setDefaultCommand(
+        new RunCommand(
+            () -> {
+                // Adjust operator rumble based on motor current draw
+                double armRumble = 
+                    Math.max(m_armSubsystem.getCurrentDraw() - ArmConstants.kMinCurrentDraw, 0)
+                    / (ArmConstants.kMaxCurrentDraw - ArmConstants.kMinCurrentDraw);
+                m_operatorController.setRumble(RumbleType.kBothRumble, armRumble);
+                  },
+            m_armSubsystem));
             
     //DRIVER CONTROLLER
 

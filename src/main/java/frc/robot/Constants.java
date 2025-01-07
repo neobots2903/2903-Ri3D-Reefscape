@@ -53,10 +53,15 @@ public final class Constants {
     public static final int kFrontRightMotorPort = 13;
     public static final int kRearRightMotorPort = 15;
 
-    public static final double kTrackWidth = 0.5; // 0.5 what?
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = 0.7; // 0.7 what?
+    public static final double kTrackWidth = 0.5; // 0.5 what?
     // Distance between centers of front and back wheels on robot
+    public static final double kWheelBase = 0.7; // 0.7 what?
+
+    // The lower bound of expected total current draw (in amps)
+    public static final double kMinCurrentDraw = 1;
+    // The upper bound of expected total current draw (in amps)
+    public static final double kMaxCurrentDraw = 40;
 
     public static final MecanumDriveKinematics kDriveKinematics =
         new MecanumDriveKinematics(
@@ -87,6 +92,11 @@ public final class Constants {
     public static final double kRotateI = 0;
     public static final double kRotateD = 0;
     public static final double kRotateF = 0;
+
+    // The lower bound of expected total current draw (in amps)
+    public static final double kMinCurrentDraw = 1;
+    // The upper bound of expected total current draw (in amps)
+    public static final double kMaxCurrentDraw = 30;
 
     //Encoder 
     public final static int kSensorUnitsPerRotation = 4096;
