@@ -42,7 +42,7 @@ import frc.robot.Constants.ClimbConstants;
 public class ClimbSubsystem extends SubsystemBase {
   private final WPI_TalonSRX m_RightClimb = new WPI_TalonSRX(ClimbConstants.kRightClimbMotorPort);
   private final VictorSPX m_engageClimb = new VictorSPX(ClimbConstants.kEngageClimbMotorPort);
-  private final VictorSP m_LeftClimb = new VictorSP(0);
+  private final VictorSP m_LeftClimb = new VictorSP(ClimbConstants.kLeftClimbMotorPort);
 
   private boolean isEngaged;
 
