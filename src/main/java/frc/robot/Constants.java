@@ -60,7 +60,7 @@ public final class Constants {
     public static final double kWheelBase = 0.7; // 0.7 what?
 
     // The lower bound of expected total current draw (in amps)
-    public static final double kMinCurrentDraw = 1;
+    public static final double kMinCurrentDraw = 5;
     // The upper bound of expected total current draw (in amps)
     public static final double kMaxCurrentDraw = 40;
 
@@ -75,51 +75,61 @@ public final class Constants {
   public static final class ArmConstants {
     public static final int kArmRotateMotorPort = 37; // Cim + Talon
     public static final int kArmExtendMotorPort = 10; // Bag + Talon
-    public static final int kArmIntakeMotorPort = 20; // Neo 550 + Spark
-    public static final int kWristPitchServoPort = 0;
-    public static final int kWristDiffServoPort = 0;
+    public static final int kArmIntakeMotorPort = 8; // Neo 550 + Spark
+    public static final int kWristPitchServoPort = 8;
+    public static final int kWristDiffServoPort = 9;
 
     // Engage PID
     public static final int kPIDLoopIdx = 0;
 
     //Extention PID 
-    public static final double kExtendP = 0;
+    public static final double kExtendP = 0.3;
     public static final double kExtendI = 0;
     public static final double kExtendD = 0;
-    public static final double kExtendF = 0;
 
-    //Rotation PID 
+    //Rotation PID
     public static final double kRotateP = 0.8;
     public static final double kRotateI = 0;
     public static final double kRotateD = 0;
     public static final double kRotateGravityScalar = 0.125;
 
     // The lower bound of expected total current draw (in amps)
-    public static final double kMinCurrentDraw = 1;
+    public static final double kMinCurrentDraw = 6;
     // The upper bound of expected total current draw (in amps)
     public static final double kMaxCurrentDraw = 30;
 
     //Encoder 
-    public final static int kSensorUnitsPerRotation = 4096 * 2; // 2:1 on output shaft
+    public final static int kAngleSensorUnitsPerRotation = 4096 * 2; // 2:1 on output shaft
+    public final static double kLengthSensorUnitsPerInch = 4096 / 1.5;
+
+    public final static int kExtendMaxTicks = -27950;
+    public final static double kExtendMaxInches = 24.0;
+    public final static int kRetractedTicksPerInch = -1177;
+    public final static int kExtendedTicksPerInch = -3779;
 
     // Intake
     public final static double kIntakeSpeed = 0.8;
 
     // Wrist
-    public final static double kWristSpeed = 0.01;
+    public final static double kWristSpeed = 0.02;
+    public static final int kExtendRate = 150;
+    public static final int kRotateRate = 7;
   }
 
   public static final class ArmPositions {
     public final static double kArmRestingDegrees = -45.0;
 
-    public static final int kExtendInPos = 0; // FIND REAL VALUES
-    public static final int kExtendOutPos = 5;
-
     public static final int kRotateGroundPos = (int)ArmSubsystem.angleDegreesToTicks(-45 - kArmRestingDegrees);
     public static final int kRotateCoralOne = (int)ArmSubsystem.angleDegreesToTicks(-30 - kArmRestingDegrees);
-    public static final int kRotateCoralTwo = (int)ArmSubsystem.angleDegreesToTicks(0 - kArmRestingDegrees);
+    public static final int kRotateCoralTwo = (int)ArmSubsystem.angleDegreesToTicks(10 - kArmRestingDegrees);
     public static final int kRotateCoralThree = (int)ArmSubsystem.angleDegreesToTicks(30 - kArmRestingDegrees);
-    public static final int kRotateCoralFour = (int)ArmSubsystem.angleDegreesToTicks(45 - kArmRestingDegrees);
+    public static final int kRotateCoralFour = (int)ArmSubsystem.angleDegreesToTicks(55 - kArmRestingDegrees);
+
+    public static final int kExtendGroundPos = (int)ArmSubsystem.positionInchesToTicks(8);
+    public static final int kExtendCoralOne = (int)ArmSubsystem.positionInchesToTicks(0);
+    public static final int kExtendCoralTwo = (int)ArmSubsystem.positionInchesToTicks(0);
+    public static final int kExtendCoralThree = (int)ArmSubsystem.positionInchesToTicks(0);
+    public static final int kExtendCoralFour = (int)ArmSubsystem.positionInchesToTicks(6);
   }
 
   public static final class ClimbConstants {

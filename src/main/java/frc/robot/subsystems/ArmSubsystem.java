@@ -10,6 +10,10 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmPositions;
 
 import com.revrobotics.spark.SparkMax;
+
+import java.util.concurrent.DelayQueue;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -28,13 +32,13 @@ public class ArmSubsystem extends SubsystemBase {
   // // Only rotates the wrist's pitch
   // private final Servo m_wristPitch = new Servo(ArmConstants.kWristPitchServoPort);
   // // Rotates the wrist's pitch and roll equally
-  // private final Servo m_wristDiff = new Servo(ArmConstants.kWristDiffServoPort);
+  private final Servo m_wristDiff = new Servo(ArmConstants.kWristDiffServoPort);
 
   // WristDiff revolutions per wirstPitch revolution
-  private final double wristDiffRatio = 1.0/3.0;
+  // private final double wristDiffRatio = 1.0/3.0;
 
   // Measured from 0.0 to 1.0 (percent of servo's range)
-  private double currentPitch = 0.0;
+  // private double currentPitch = 0.0;
   private double currentRoll = 0.0;
 
   /** Creates a new ArmSubsystem. */
@@ -55,14 +59,28 @@ public class ArmSubsystem extends SubsystemBase {
 		m_armExtend.config_kP(ArmConstants.kPIDLoopIdx, ArmConstants.kExtendP, Constants.kTimeoutMs);
 		m_armExtend.config_kI(ArmConstants.kPIDLoopIdx, ArmConstants.kExtendI, Constants.kTimeoutMs);
     m_armExtend.config_kD(ArmConstants.kPIDLoopIdx, ArmConstants.kExtendD, Constants.kTimeoutMs);
-    m_armExtend.config_kF(ArmConstants.kPIDLoopIdx, ArmConstants.kExtendF, Constants.kTimeoutMs);
+    
+    // Acceleration of 4 inches / s^2
+    m_armExtend.configMotionAcceleration(positionInchesToTicks(4) * 0.1);
+    // Peak velocity of 2 inches per second
+    m_armExtend.configMotionCruiseVelocity(positionInchesToTicks(2) * 0.1);
+    // Use trapezoidal curve
+    m_armExtend.configMotionSCurveStrength(0);
 
     // Enable Rotate PID Stuff
 		m_armRotate.config_kP(ArmConstants.kPIDLoopIdx, ArmConstants.kRotateP, Constants.kTimeoutMs);
 		m_armRotate.config_kI(ArmConstants.kPIDLoopIdx, ArmConstants.kRotateI, Constants.kTimeoutMs);
     m_armRotate.config_kD(ArmConstants.kPIDLoopIdx, ArmConstants.kRotateD, Constants.kTimeoutMs);
 
+    // Acceleration of 180 degrees / s^2
+    m_armRotate.configMotionAcceleration(angleDegreesToTicks(180) * 0.1);
+    // Peak velocity of 90 degrees per second
+    m_armRotate.configMotionCruiseVelocity(angleDegreesToTicks(90) * 0.1);
+    // Use trapezoidal curve
+    m_armRotate.configMotionSCurveStrength(0);
+
     zeroArmAngle();
+    //zeroArmLength();
   }
 
   public void cancelPid() {
@@ -82,9 +100,9 @@ public class ArmSubsystem extends SubsystemBase {
         m_armIntake.getOutputCurrent();
   }
 
-  public double GetWristPitch() {
-    return currentPitch;
-  }
+  // public double GetWristPitch() {
+  //   return currentPitch;
+  // }
 
   public double GetWristRoll() {
     return currentRoll;
@@ -94,27 +112,35 @@ public class ArmSubsystem extends SubsystemBase {
   //   SetWristPosition(pitch, currentRoll);
   // }
 
-  // public void SetWristRoll(double roll) {
-  //   SetWristPosition(currentPitch, roll);
-  // }
+  public void SetWristRoll(double roll) {
+    // SetWristPosition(currentPitch, roll);
+    roll = Math.max(Math.min(roll, 1), 0);
+    m_wristDiff.set(roll);
+    currentRoll = roll;
+  }
 
   // /* Sets wrist pitch and roll positions from 0.0 to 1.0. */
   // public void SetWristPosition(double pitch, double roll) {
   //   pitch = Math.max(Math.min(pitch, 1), 0);
   //   roll = Math.max(Math.min(roll, 1), 0);
-  //   m_wristPitch.set(roll * wristDiffRatio - (pitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio);
+  //   //m_wristPitch.set(roll * wristDiffRatio - (pitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio);
+  //   m_wristPitch.set(pitch);
   //   m_wristDiff.set(roll);
   //   currentPitch = pitch;
   //   currentRoll = roll;
   // }
 
-  public void SetExtensionPos(double setPos){
-    m_armExtend.set(TalonSRXControlMode.Position, setPos);
+  public void SetExtensionPos(double setPos, boolean doSmoothing){
+    // Ticks are negative...
+    if (setPos < ArmConstants.kExtendMaxTicks) {
+      setPos = ArmConstants.kExtendMaxTicks;
+    }
+    m_armExtend.set(doSmoothing ? TalonSRXControlMode.MotionMagic : TalonSRXControlMode.Position, setPos);
   }
 
-  public void SetRotationPos(double setPos) {
+  public void SetRotationPos(double setPos, boolean doSmoothing) {
     m_armRotate.set(
-      TalonSRXControlMode.Position,
+      doSmoothing ? TalonSRXControlMode.MotionMagic : TalonSRXControlMode.Position,
       setPos,
       DemandType.ArbitraryFeedForward,
       ArmConstants.kRotateGravityScalar * Math.cos(currentArmAngle() * Math.PI / 180)
@@ -124,17 +150,15 @@ public class ArmSubsystem extends SubsystemBase {
   public void SetIntakeSpeed(double speed) {
     m_armIntake.set(speed);
   }
+  
+  // Arm angle functions
 
   public static double angleTicksToDegrees(double ticks) {
-    return ticks / ArmConstants.kSensorUnitsPerRotation * 360;
+    return ticks / ArmConstants.kAngleSensorUnitsPerRotation * 360;
   }
 
   public static double angleDegreesToTicks(double degrees) {
-    return degrees / 360 * ArmConstants.kSensorUnitsPerRotation;
-  }
-
-  public void zeroArmAngle() {
-    m_armRotate.setSelectedSensorPosition(0);
+    return degrees / 360 * ArmConstants.kAngleSensorUnitsPerRotation;
   }
 
   public double currentArmAngle() {
@@ -145,14 +169,149 @@ public class ArmSubsystem extends SubsystemBase {
     return angleTicksToDegrees(m_armRotate.getClosedLoopTarget()) + ArmPositions.kArmRestingDegrees;
   }
 
+  // Arm length functions
+
+  public static double positionTicksToInches(double ticks) {
+    double percentTicks = ticks / ArmConstants.kExtendMaxTicks;
+    // ticksPerInch is a function of position
+    double curTicksPerInch = percentTicks * (ArmConstants.kExtendedTicksPerInch - ArmConstants.kRetractedTicksPerInch) + ArmConstants.kRetractedTicksPerInch;
+
+    double startInchesPerTick = 1.0 / ArmConstants.kRetractedTicksPerInch;
+    //inchesPerTick decreases over distance
+    double curInchesPerTick = 1.0 / curTicksPerInch;
+    
+    return ticks * (curInchesPerTick + startInchesPerTick / 2);
+  }
+
+  // Note: positive inches returns a negative tick offset
+  public static double positionInchesToTicks(double inches) {
+    double percentInches = inches / ArmConstants.kExtendMaxInches;
+    // inchesPerTick is a function of position
+    double curInchesPerTick = percentInches * (1.0/ArmConstants.kExtendedTicksPerInch - 1.0/ArmConstants.kRetractedTicksPerInch) + 1.0/ArmConstants.kRetractedTicksPerInch;
+
+    double startTicksPerInch = ArmConstants.kRetractedTicksPerInch;
+    //ticksPerInch increases over distance
+    double curTicksPerInch = 1.0 / curInchesPerTick;
+    
+    return inches * (startTicksPerInch + curTicksPerInch / 2);
+  }
+
+  public void zeroArmLength() {
+    m_armExtend.setSelectedSensorPosition(0);
+    SetExtensionPos(0, false);
+  }
+
+  public void zeroArmAngle() {
+    m_armRotate.setSelectedSensorPosition(0);
+    SetRotationPos(0, false);
+  }
+
+  private final double sampleMillis = 500;
+  private final double zeroingAngleStepTicks = angleDegreesToTicks(2);
+  private final double zeroingLengthStepTicks = positionInchesToTicks(0.5);
+  
+  private boolean isZeroing = false;
+  private boolean zeroingLengthDone = false;
+  private boolean zeroingAngleDone = false;
+  private double zeroingLengthStepPos = 0;
+  private double zeroingAngleStepPos = 0;
+  private double zeroingStepTime = System.currentTimeMillis();
+  
+  public void autoZeroArm() {
+    if (!isZeroing) {
+      // Update step time and positions
+      zeroingStepTime = System.currentTimeMillis();
+      // zeroingAngleStepPos = m_armRotate.getSelectedSensorPosition();
+      zeroingLengthStepPos = m_armExtend.getSelectedSensorPosition();
+      isZeroing = true;
+    }
+
+    if (!autoZeroDone()) {
+      // Slowly move arm for a short amount of time
+      if (zeroingStepTime + sampleMillis > System.currentTimeMillis()) {
+        // m_armRotate.set(TalonSRXControlMode.PercentOutput, zeroingAngleDone ? 0 : -0.1);
+        m_armExtend.set(TalonSRXControlMode.PercentOutput, zeroingLengthDone ? 0 : 0.3);
+      } else {
+        // If angle has changed enough, keep going; otherwise stop and zero
+        // if (!zeroingAngleDone && zeroingAngleStepPos - zeroingAngleStepTicks > m_armRotate.getSelectedSensorPosition()) {
+        //   zeroingAngleStepPos = m_armRotate.getSelectedSensorPosition();
+        // } else {
+        //   m_armRotate.set(TalonSRXControlMode.PercentOutput, 0);
+        //   zeroArmAngle();
+        //   zeroingAngleDone = true;
+        // }
+        zeroArmAngle();
+
+        // If length has changed enough, keep going; otherwise stop and zero
+        if (!zeroingLengthDone && zeroingLengthStepPos - zeroingLengthStepTicks < m_armExtend.getSelectedSensorPosition()) {
+          zeroingLengthStepPos = m_armExtend.getSelectedSensorPosition();
+        } else {
+          m_armExtend.set(TalonSRXControlMode.PercentOutput, 0);
+          zeroArmLength();
+          zeroingLengthDone = true;
+        }
+
+        // Update step time
+        zeroingStepTime = System.currentTimeMillis();
+      }
+    }
+  }
+
+  public boolean autoZeroDone() {
+    return zeroingLengthDone;// && zeroingAngleDone;
+  }
+
+  public void resetZeroingFlag() {
+    m_armRotate.set(TalonSRXControlMode.PercentOutput, 0);
+    m_armExtend.set(TalonSRXControlMode.PercentOutput, 0);
+    zeroingLengthDone = false;
+    zeroingAngleDone = false;
+    isZeroing = false;
+  }
+
+  public double currentArmAngleTicks() {
+    return m_armRotate.getSelectedSensorPosition();
+  }
+
+  public double targetArmAngleTicks() {
+    return m_armRotate.getClosedLoopTarget();
+  }
+
+  public double targetArmLengthTicks() {
+    return m_armExtend.getClosedLoopTarget();
+  }
+
+
+  public double currentArmExtendTicks() {
+    return m_armExtend.getSelectedSensorPosition();
+  }
+
+  public double currentArmInches() {
+    return positionTicksToInches(m_armExtend.getSelectedSensorPosition());
+  }
+
+  public double targetArmInches() {
+    return positionTicksToInches(m_armExtend.getClosedLoopTarget());
+  }
+
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    SmartDashboard.putNumber("Arm Extension Encoder Ticks", m_armExtend.getSelectedSensorPosition());
     SmartDashboard.putNumber("Arm Rotate Encoder Ticks", m_armRotate.getSelectedSensorPosition());
     SmartDashboard.putNumber("Arm Rotate Setpoint", m_armRotate.getClosedLoopTarget());
     SmartDashboard.putNumber("Arm Rotate Degrees", currentArmAngle());
-    SmartDashboard.putNumber("PID Error", m_armRotate.getClosedLoopError());
-    SmartDashboard.putNumber("Motor Amps", m_armRotate.getStatorCurrent());
+    SmartDashboard.putNumber("Arm Rotate PID Error", m_armRotate.getClosedLoopError());
+    SmartDashboard.putNumber("Arm Rotate Motor Amps", m_armRotate.getStatorCurrent());
+
+    SmartDashboard.putNumber("Arm Extend Encoder Ticks", m_armExtend.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Arm Extend Setpoint", m_armExtend.getClosedLoopTarget());
+    SmartDashboard.putNumber("Arm Extend Inches", currentArmInches());
+    SmartDashboard.putNumber("Arm Extend PID Error", m_armExtend.getClosedLoopError());
+    SmartDashboard.putNumber("Arm Extend Motor Amps", m_armExtend.getStatorCurrent());
+
+    SmartDashboard.putBoolean("Zeroing Done", autoZeroDone());
+
+    SmartDashboard.putNumber("Wrist Roll", m_wristDiff.get());
+    // SmartDashboard.putNumber("Wrist Pitch", m_wristPitch.get());
   }
 }

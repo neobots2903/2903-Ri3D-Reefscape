@@ -6,17 +6,33 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants.LEDConstants;
 
-import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDSubsystem extends SubsystemBase {
   
-  // Since data timings can be as fast as 0.7 usecs, a separate co-processor must drive the LEDs.
-  // This class will send RGB values to the co-processor at a more leisurely pace.
-  private final DigitalOutput m_ledData = new DigitalOutput(LEDConstants.kLedDataDigitalPort);
+  private final SerialPort m_ledSerial = new SerialPort(9600, Port.kUSB);
+
+  public enum LEDMode {
+    Idle,
+    Blue,
+    Red,
+    Demo,
+    Off
+  }
+
+  LEDMode currentMode;
+
+  public void setLEDMode(LEDMode mode) {
+    currentMode = mode;
+    m_ledSerial.writeString(Integer.toString(mode.ordinal()));
+    m_ledSerial.flush();
+  }
 
   /** Creates a new LEDSubsystem. */
   public LEDSubsystem() {
+    setLEDMode(LEDMode.Idle);
   }
 
   @Override

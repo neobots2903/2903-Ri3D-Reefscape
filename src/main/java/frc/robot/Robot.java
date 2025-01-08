@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.LEDSubsystem.LEDMode;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -46,7 +47,10 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.stopControllerVibrate();
+    m_robotContainer.setLEDMode(LEDMode.Idle);
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -60,6 +64,7 @@ public class Robot extends TimedRobot {
     // if (m_autonomousCommand != null) {
     //   m_autonomousCommand.schedule();
     // }
+    m_robotContainer.setLEDMode(LEDMode.Blue);
   }
 
   /** This function is called periodically during autonomous. */
@@ -75,6 +80,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.setLEDMode(LEDMode.Red);
   }
 
   /** This function is called periodically during operator control. */
