@@ -31,6 +31,7 @@ public class DifferentialWrist extends SubsystemBase {
 
     private double targetRoll = 0; // Desired roll angle
     private double targetPitch = 0; // Desired pitch angle
+    private final double wristDiffRatio = 1.0/3.0; // WristDiff revolutions per wirstPitch revolution
 
     public DifferentialWrist() {
         m_rollServo = new Servo(ArmConstants.kWristDiffServoPort);
@@ -96,6 +97,7 @@ public class DifferentialWrist extends SubsystemBase {
         double maxAngle = 90.0;
 
         return (rollAngle - minAngle) / (maxAngle - minAngle) * (maxServo - minServo) + minServo;
+        //  m_wristPitch.set(roll * wristDiffRatio - (pitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio);
     }
 
     @Override
