@@ -4,16 +4,12 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Servo;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmPositions;
 
 import com.revrobotics.spark.SparkMax;
 
-import java.util.concurrent.DelayQueue;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -27,7 +23,10 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final WPI_TalonSRX m_armRotate = new WPI_TalonSRX(ArmConstants.kArmRotateMotorPort);
   private final WPI_TalonSRX m_armExtend = new WPI_TalonSRX(ArmConstants.kArmExtendMotorPort);
-  private final SparkMax m_armIntake = new SparkMax(ArmConstants.kArmIntakeMotorPort, MotorType.kBrushless);
+
+  // Temporarily switching to Bag Motor
+  private final SparkMax m_intake = new SparkMax(ArmConstants.kArmIntakeMotorPort, MotorType.kBrushed);
+  // private final SparkMax m_intake = new SparkMax(ArmConstants.kArmIntakeMotorPort, MotorType.kBrushless);
 
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
@@ -85,7 +84,7 @@ public class ArmSubsystem extends SubsystemBase {
   public double getCurrentDraw() {
     return m_armRotate.getStatorCurrent() +
         m_armExtend.getStatorCurrent() +
-        m_armIntake.getOutputCurrent();
+        m_intake.getOutputCurrent();
   }
 
   public void SetExtensionPos(double setPos, boolean doSmoothing){
@@ -106,7 +105,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void SetIntakeSpeed(double speed) {
-    m_armIntake.set(speed);
+    m_intake.set(speed);
   }
   
   // Arm angle functions
@@ -165,14 +164,14 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private final double sampleMillis = 500;
-  private final double zeroingAngleStepTicks = angleDegreesToTicks(2);
+  // private final double zeroingAngleStepTicks = angleDegreesToTicks(2);
   private final double zeroingLengthStepTicks = positionInchesToTicks(0.5);
   
   private boolean isZeroing = false;
   private boolean zeroingLengthDone = false;
-  private boolean zeroingAngleDone = false;
+  // private boolean zeroingAngleDone = false;
   private double zeroingLengthStepPos = 0;
-  private double zeroingAngleStepPos = 0;
+  // private double zeroingAngleStepPos = 0;
   private double zeroingStepTime = System.currentTimeMillis();
   
   public void autoZeroArm() {
@@ -223,7 +222,7 @@ public class ArmSubsystem extends SubsystemBase {
     m_armRotate.set(TalonSRXControlMode.PercentOutput, 0);
     m_armExtend.set(TalonSRXControlMode.PercentOutput, 0);
     zeroingLengthDone = false;
-    zeroingAngleDone = false;
+    // zeroingAngleDone = false;
     isZeroing = false;
   }
 
