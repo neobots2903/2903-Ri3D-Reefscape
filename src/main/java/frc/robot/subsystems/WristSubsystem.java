@@ -24,19 +24,26 @@ public class WristSubsystem extends SubsystemBase {
     private final SparkMax m_pitchMotor; // Neo 550 for pitch
 
     private SparkMaxConfig pitchMotorConfig; // Config for Neo 550
-    private SparkClosedLoopController  pitchPid; // PID controller for pitch
+    private SparkClosedLoopController pitchPid; // PID controller for pitch
     private RelativeEncoder encoder; // Encoder for Neo 550
     private SparkLimitSwitch forwardLimitSwitch; // SoftStop for Neo 550
     private SparkLimitSwitch reverseLimitSwitch;
 
-    private double targetRoll = 0; // Desired roll angle
-    private double targetPitch = 0; // Desired pitch angle
-    private final double wristDiffRatio = 1.0/3.0; // WristDiff revolutions per wirstPitch revolution
-
+    private double targetRoll = 0; // Desired roll angle in degrees
+    private double targetPitch = 0; // Desired pitch angle in degrees
+    
+    // Constants for pitch angle conversion
+    private static final double GEAR_RATIO = 100.0; // TODO: GET RATIO
+    private static final double ENCODER_COUNTS_PER_MOTOR_REV = 42.0;
+    private static final double DEGREES_PER_REV = 360.0;
+    
+    // Differential ratio between roll and pitch
+    private final double wristDiffRatio = 1.0/3.0;
+    
     public WristSubsystem() {
         m_rollServo = new Servo(ArmConstants.kWristDiffServoPort);
         m_pitchMotor = new SparkMax(ArmConstants.kWristPitchMotorPort, MotorType.kBrushless);
-        pitchPid  = m_pitchMotor.getClosedLoopController();
+        pitchPid = m_pitchMotor.getClosedLoopController();
         encoder = m_pitchMotor.getEncoder();
         pitchMotorConfig = new SparkMaxConfig();
 
@@ -44,33 +51,46 @@ public class WristSubsystem extends SubsystemBase {
         pitchMotorConfig
             .inverted(false)
             .idleMode(IdleMode.kBrake);
-        // Set up encoders
+            
+        // Set up encoders with conversion factor for degrees
+        double positionConversionFactor = DEGREES_PER_REV / (ENCODER_COUNTS_PER_MOTOR_REV * GEAR_RATIO);
+        double velocityConversionFactor = positionConversionFactor / 60.0; // Convert RPM to degrees/second
+        
         pitchMotorConfig.encoder
-            .positionConversionFactor(1) // Need to measure.
-            .velocityConversionFactor(1);
-        // Configure Pid loop
+            .positionConversionFactor(positionConversionFactor)
+            .velocityConversionFactor(velocityConversionFactor);
+            
+        // Configure PID loop - adjusted gains for degree-based control
         pitchMotorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(0.1, 0.0, 0.0);
-        // Enable limit switches to stop the motor when they are closed
+            .pid(0.05, 0.0, 0.0);  // Adjusted PID values for degree control
+            
+        // Set limit switches
         pitchMotorConfig.limitSwitch
             .forwardLimitSwitchType(Type.kNormallyOpen)
             .forwardLimitSwitchEnabled(true)
             .reverseLimitSwitchType(Type.kNormallyOpen)
             .reverseLimitSwitchEnabled(true);
-        // Set the soft limits to stop the motor at -50 and 50 rotations
+            
+        // Set soft limits in degrees
         pitchMotorConfig.softLimit
-            .forwardSoftLimit(50)
+            .forwardSoftLimit(45.0)  // Maximum 90 degrees up
             .forwardSoftLimitEnabled(true)
-            .reverseSoftLimit(-50)
+            .reverseSoftLimit(-45.0) // Maximum 90 degrees down
             .reverseSoftLimitEnabled(true);
 
         m_pitchMotor.configure(pitchMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        
+        // Initialize limit switches after configuration
+        forwardLimitSwitch = m_pitchMotor.getForwardLimitSwitch();
+        reverseLimitSwitch = m_pitchMotor.getReverseLimitSwitch();
     }
 
     public void setTargetAngles(double roll, double pitch) {
-        this.targetRoll = roll;
-        this.targetPitch = pitch;
+        // Clamp pitch angle to soft limits
+        this.targetPitch = Math.min(Math.max(pitch, -45.0), 45.0);
+        // Clamp roll angle to servo limits
+        this.targetRoll = Math.min(Math.max(roll, -45.0), 45.0);
     }
 
     public double getTargetRoll() {
@@ -82,37 +102,52 @@ public class WristSubsystem extends SubsystemBase {
     }
 
     public void update(double currentPitch) {
-        m_rollServo.set(mapRollToServoPosition(targetRoll));
-        pitchPid.setReference(targetPitch, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        // Convert target angles to compensated angles
+        double compensatedPitch = targetPitch + calculatePitchCompensation(targetRoll);
+        double compensatedRoll = targetRoll + calculateRollCompensation(targetPitch);
+
+        // Update servo and motor with compensated values
+        m_rollServo.set(mapRollToServoPosition(compensatedRoll));
+        pitchPid.setReference(compensatedPitch, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     public void stop() {
         m_pitchMotor.stopMotor();
     }
 
+    private double calculatePitchCompensation(double rollAngle) {
+        // For every degree of roll, pitch changes by 1/3 degree
+        return rollAngle * wristDiffRatio;
+    }
+    
+    private double calculateRollCompensation(double pitchAngle) {
+        // For every degree of pitch, roll changes by 1/3 degree
+        return pitchAngle * wristDiffRatio;
+    }
+
     private double mapRollToServoPosition(double rollAngle) {
         double minServo = 0.0;
         double maxServo = 1.0;
-        double minAngle = -90.0;
-        double maxAngle = 90.0;
+        double minAngle = -45.0;
+        double maxAngle = 45.0;
 
         return (rollAngle - minAngle) / (maxAngle - minAngle) * (maxServo - minServo) + minServo;
-        //  m_wristPitch.set(roll * wristDiffRatio - (pitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio);
     }
 
     @Override
     public void periodic() {
-        // Display encoder position and velocity
-        SmartDashboard.putNumber("Actual Position", encoder.getPosition());
-        SmartDashboard.putNumber("Actual Velocity", encoder.getVelocity());
+        // Display encoder position and velocity in degrees
+        SmartDashboard.putNumber("Pitch Angle (deg)", encoder.getPosition());
+        SmartDashboard.putNumber("Pitch Velocity (deg/s)", encoder.getVelocity());
+        SmartDashboard.putNumber("Target Pitch (deg)", targetPitch);
+        SmartDashboard.putNumber("Position Error (deg)", targetPitch - encoder.getPosition());
 
         SmartDashboard.putBoolean("Forward Limit Reached", forwardLimitSwitch.isPressed());
         SmartDashboard.putBoolean("Reverse Limit Reached", reverseLimitSwitch.isPressed());
-        SmartDashboard.putNumber("Applied Output", m_pitchMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Motor Output", m_pitchMotor.getAppliedOutput());
 
         if (SmartDashboard.getBoolean("Reset Encoder", false)) {
             SmartDashboard.putBoolean("Reset Encoder", false);
-            // Reset the encoder position to 0
             encoder.setPosition(0);
         }
     }
