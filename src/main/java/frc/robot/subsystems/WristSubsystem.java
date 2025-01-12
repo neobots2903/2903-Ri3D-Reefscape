@@ -40,6 +40,9 @@ public class WristSubsystem extends SubsystemBase {
     // Differential ratio between roll and pitch
     private final double wristDiffRatio = 1.0/3.0;
     
+    // Minimum angle for compensation calculations
+    private static final double MIN_COMPENSATION_ANGLE = 1.0;
+    
     public WristSubsystem() {
         m_rollServo = new Servo(ArmConstants.kWristDiffServoPort);
         m_pitchMotor = new SparkMax(ArmConstants.kWristPitchMotorPort, MotorType.kBrushless);
@@ -74,9 +77,9 @@ public class WristSubsystem extends SubsystemBase {
             
         // Set soft limits in degrees
         pitchMotorConfig.softLimit
-            .forwardSoftLimit(45.0)  // Maximum 90 degrees up
+            .forwardSoftLimit(45.0)  // Maximum 45 degrees up
             .forwardSoftLimitEnabled(true)
-            .reverseSoftLimit(-45.0) // Maximum 90 degrees down
+            .reverseSoftLimit(-45.0) // Maximum 45 degrees down
             .reverseSoftLimitEnabled(true);
 
         m_pitchMotor.configure(pitchMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -101,6 +104,14 @@ public class WristSubsystem extends SubsystemBase {
         return this.targetPitch;
     }
 
+    public double getCurrentPitch() {
+        return encoder.getPosition();
+    }
+
+    public double getCurrentRoll() {
+        return (m_rollServo.get() - 0.5) * 90.0;  // Convert servo position back to degrees
+    }
+
     public void update(double currentPitch) {
         // Convert target angles to compensated angles
         double compensatedPitch = targetPitch + calculatePitchCompensation(targetRoll);
@@ -116,11 +127,15 @@ public class WristSubsystem extends SubsystemBase {
     }
 
     private double calculatePitchCompensation(double rollAngle) {
+        // Ignore very small angles to prevent tiny oscillations
+        if (Math.abs(rollAngle) < MIN_COMPENSATION_ANGLE) return 0.0;
         // For every degree of roll, pitch changes by 1/3 degree
         return rollAngle * wristDiffRatio;
     }
     
     private double calculateRollCompensation(double pitchAngle) {
+        // Ignore very small angles to prevent tiny oscillations
+        if (Math.abs(pitchAngle) < MIN_COMPENSATION_ANGLE) return 0.0;
         // For every degree of pitch, roll changes by 1/3 degree
         return pitchAngle * wristDiffRatio;
     }
@@ -142,10 +157,17 @@ public class WristSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Target Pitch (deg)", targetPitch);
         SmartDashboard.putNumber("Position Error (deg)", targetPitch - encoder.getPosition());
 
+        // Display compensation calculations
+        SmartDashboard.putNumber("Compensated Pitch", targetPitch + calculatePitchCompensation(targetRoll));
+        SmartDashboard.putNumber("Compensated Roll", targetRoll + calculateRollCompensation(targetPitch));
+        SmartDashboard.putNumber("Roll Servo Position", m_rollServo.get());
+
+        // Display limit switch status
         SmartDashboard.putBoolean("Forward Limit Reached", forwardLimitSwitch.isPressed());
         SmartDashboard.putBoolean("Reverse Limit Reached", reverseLimitSwitch.isPressed());
         SmartDashboard.putNumber("Motor Output", m_pitchMotor.getAppliedOutput());
 
+        // Handle encoder reset request
         if (SmartDashboard.getBoolean("Reset Encoder", false)) {
             SmartDashboard.putBoolean("Reset Encoder", false);
             encoder.setPosition(0);
