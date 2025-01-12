@@ -53,6 +53,7 @@ public class WristSubsystem extends SubsystemBase {
         // Set brake mode
         pitchMotorConfig
             .inverted(false)
+            .smartCurrentLimit(20) // Trying to minimize damage to wrist from powerful motor
             .idleMode(IdleMode.kBrake);
             
         // Set up encoders with conversion factor for degrees
