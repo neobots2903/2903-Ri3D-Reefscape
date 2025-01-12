@@ -26,6 +26,7 @@ public class RobotContainer {
   private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
+  private final DifferentialWrist m_wristSubsystem = new DifferentialWrist();
 
   private final double DEADZONE_THRESH = 0.1;
 
@@ -76,10 +77,6 @@ public class RobotContainer {
     m_armSubsystem.setDefaultCommand(
         new RunCommand(
             () -> {
-                // Move wrist position
-                double rollOffset = deadzone(m_operatorController.getRightX()) * ArmConstants.kWristSpeed;
-                m_armSubsystem.SetWristRoll( m_armSubsystem.GetWristRoll() + rollOffset);
-
                 // Move arm extend
                 double extendOffset = deadzone(m_operatorController.getLeftTriggerAxis() - m_operatorController.getRightTriggerAxis()) * ArmConstants.kExtendRate;
                 int extendPos = (int)Math.min(m_armSubsystem.targetArmLengthTicks() + extendOffset, 0);
@@ -89,8 +86,7 @@ public class RobotContainer {
                 double rotateOffset = deadzone(-m_operatorController.getLeftY()) * ArmConstants.kRotateRate;
                 int rotatePos = (int)Math.max(m_armSubsystem.targetArmAngleTicks() + rotateOffset, 0);
                 m_armSubsystem.SetRotationPos(rotatePos, true);
-                // double pitchOffset = deadzone(m_operatorController.getLeftY()) * ArmConstants.kWristSpeed;
-                // m_armSubsystem.SetWristPosition(m_armSubsystem.GetWristPitch() + pitchOffset, m_armSubsystem.GetWristRoll() + rollOffset);
+
                 // Adjust operator rumble based on motor current draw
                 double armRumble = 
                     Math.max(m_armSubsystem.getCurrentDraw() - ArmConstants.kMinCurrentDraw, 0)
@@ -98,6 +94,13 @@ public class RobotContainer {
                 m_operatorController.setRumble(RumbleType.kBothRumble, armRumble);
                   },
             m_armSubsystem));
+
+    m_wristSubsystem.setDefaultCommand(
+      new RunCommand(() -> {
+        // Move wrist position
+        m_wristSubsystem.setTargetAngles(deadzone(m_operatorController.getRightX()), deadzone(m_operatorController.getRightY()));
+      },
+      m_wristSubsystem));
             
     //DRIVER CONTROLLER
 
