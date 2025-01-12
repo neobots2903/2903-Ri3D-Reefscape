@@ -77,6 +77,7 @@ public final class Constants {
     public static final int kArmExtendMotorPort = 10; // Bag + Talon
     public static final int kArmIntakeMotorPort = 8; // Neo 550 + Spark
     public static final int kWristPitchServoPort = 8;
+    public static final int kWristPitchMotorPort = 1000; // TODO: Need to figure out
     public static final int kWristDiffServoPort = 9;
 
     // Engage PID

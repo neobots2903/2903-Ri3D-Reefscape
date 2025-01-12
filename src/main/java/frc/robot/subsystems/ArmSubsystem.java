@@ -30,15 +30,15 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMax m_armIntake = new SparkMax(ArmConstants.kArmIntakeMotorPort, MotorType.kBrushless);
 
   // // Only rotates the wrist's pitch
-  // private final Servo m_wristPitch = new Servo(ArmConstants.kWristPitchServoPort);
+  private final SparkMax m_wristPitch = new SparkMax(ArmConstants.kWristPitchMotorPort, MotorType.kBrushless);
   // // Rotates the wrist's pitch and roll equally
   private final Servo m_wristDiff = new Servo(ArmConstants.kWristDiffServoPort);
 
   // WristDiff revolutions per wirstPitch revolution
-  // private final double wristDiffRatio = 1.0/3.0;
+  private final double wristDiffRatio = 1.0/3.0; // Assuming this is the same from servo to motor
 
   // Measured from 0.0 to 1.0 (percent of servo's range)
-  // private double currentPitch = 0.0;
+  private double currentPitch = 0.0; // TODO: Fix this
   private double currentRoll = 0.0;
 
   /** Creates a new ArmSubsystem. */
@@ -53,7 +53,7 @@ public class ArmSubsystem extends SubsystemBase {
 
       // Set Brake Mode
     m_armExtend.setNeutralMode(NeutralMode.Brake);
-    m_armRotate.setNeutralMode(NeutralMode.Brake); // NEEDS TO BE BRAKE
+    m_armRotate.setNeutralMode(NeutralMode.Brake);
 
     // Enable Extention PID Stuff
 		m_armExtend.config_kP(ArmConstants.kPIDLoopIdx, ArmConstants.kExtendP, Constants.kTimeoutMs);
@@ -100,35 +100,36 @@ public class ArmSubsystem extends SubsystemBase {
         m_armIntake.getOutputCurrent();
   }
 
-  // public double GetWristPitch() {
-  //   return currentPitch;
-  // }
+  public double GetWristPitch() {
+    return currentPitch;
+  }
 
   public double GetWristRoll() {
     return currentRoll;
   }
 
-  // public void SetWristPitch(double pitch) {
-  //   SetWristPosition(pitch, currentRoll);
-  // }
+  public void SetWristPitch(double pitch) {
+    SetWristPosition(pitch, currentRoll);
+  }
 
   public void SetWristRoll(double roll) {
-    // SetWristPosition(currentPitch, roll);
+    SetWristPosition(currentPitch, roll);
     roll = Math.max(Math.min(roll, 1), 0);
     m_wristDiff.set(roll);
     currentRoll = roll;
   }
 
-  // /* Sets wrist pitch and roll positions from 0.0 to 1.0. */
-  // public void SetWristPosition(double pitch, double roll) {
-  //   pitch = Math.max(Math.min(pitch, 1), 0);
-  //   roll = Math.max(Math.min(roll, 1), 0);
-  //   //m_wristPitch.set(roll * wristDiffRatio - (pitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio);
-  //   m_wristPitch.set(pitch);
-  //   m_wristDiff.set(roll);
-  //   currentPitch = pitch;
-  //   currentRoll = roll;
-  // }
+  // TODO: Test entire method...
+  /* Sets wrist pitch and roll positions from 0.0 to 1.0. */
+  public void SetWristPosition(double pitch, double roll) {
+    pitch = Math.max(Math.min(pitch, 1), 0);
+    roll = Math.max(Math.min(roll, 1), 0);
+    m_wristPitch.set(roll * wristDiffRatio - (pitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio);
+    // m_wristPitch.set(pitch);
+    m_wristDiff.set(roll);
+    currentPitch = pitch;
+    currentRoll = roll;
+  }
 
   public void SetExtensionPos(double setPos, boolean doSmoothing){
     // Ticks are negative...
