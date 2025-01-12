@@ -26,7 +26,7 @@ public class RobotContainer {
   private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
-  private final DifferentialWrist m_wristSubsystem = new DifferentialWrist();
+  private final WristSubsystem m_wristSubsystem = new WristSubsystem();
 
   private final double DEADZONE_THRESH = 0.1;
 
@@ -96,11 +96,18 @@ public class RobotContainer {
             m_armSubsystem));
 
     m_wristSubsystem.setDefaultCommand(
-      new RunCommand(() -> {
-        // Move wrist position
-        m_wristSubsystem.setTargetAngles(deadzone(m_operatorController.getRightX()), deadzone(m_operatorController.getRightY()));
-      },
-      m_wristSubsystem));
+      new RunCommand(
+          () -> {
+              // Map joystick inputs to target angles
+              double roll = deadzone(m_operatorController.getRightX()) * 45.0; // Scale to [-45, 45]
+              double pitch = deadzone(m_operatorController.getRightY()) * 45.0; // Scale to [-45, 45]
+  
+              m_wristSubsystem.setTargetAngles(roll, pitch);
+              m_wristSubsystem.update(pitch); // Apply
+          },
+          m_wristSubsystem
+      )
+  );
             
     //DRIVER CONTROLLER
 

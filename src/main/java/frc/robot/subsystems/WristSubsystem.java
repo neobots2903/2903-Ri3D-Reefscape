@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
-public class DifferentialWrist extends SubsystemBase {
+public class WristSubsystem extends SubsystemBase {
     private final Servo m_rollServo; // Rev Smart Servo for roll
     private final SparkMax m_pitchMotor; // Neo 550 for pitch
 
@@ -33,7 +33,7 @@ public class DifferentialWrist extends SubsystemBase {
     private double targetPitch = 0; // Desired pitch angle
     private final double wristDiffRatio = 1.0/3.0; // WristDiff revolutions per wirstPitch revolution
 
-    public DifferentialWrist() {
+    public WristSubsystem() {
         m_rollServo = new Servo(ArmConstants.kWristDiffServoPort);
         m_pitchMotor = new SparkMax(ArmConstants.kWristPitchMotorPort, MotorType.kBrushless);
         pitchPid  = m_pitchMotor.getClosedLoopController();
