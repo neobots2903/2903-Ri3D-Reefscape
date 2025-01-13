@@ -99,8 +99,8 @@ public class RobotContainer {
       new RunCommand(
           () -> {
               // Map joystick inputs to target angles
-              double roll = deadzone(m_operatorController.getRightX()) * 0.01; // Testing #, make constant later.
-              double pitch = deadzone(m_operatorController.getRightY()) * 0.01; 
+              double roll = deadzone(m_operatorController.getRightX()) * 0.5; // Constants later...
+              double pitch = deadzone(m_operatorController.getRightY()) * 45.0;
   
               m_wristSubsystem.setTargetAngles(m_wristSubsystem.getCurrentRoll() + roll, m_wristSubsystem.getCurrentPitch() + pitch);
               // m_wristSubsystem.setTargetAngles(roll, pitch);
