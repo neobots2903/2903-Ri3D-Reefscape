@@ -75,7 +75,7 @@ public class WristSubsystem extends SubsystemBase {
             .p(0.1)
             .i(0.0)
             .d(0.0)
-            .outputRange(-1, 0.3);
+            .outputRange(-1, 0.1);
 
         // Set soft limits in degrees
         pitchMotorConfig.softLimit
