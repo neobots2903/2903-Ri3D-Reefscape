@@ -77,16 +77,16 @@ public class DriveSubsystem extends SubsystemBase {
             m_frontRight.getSelectedSensorPosition(),
             m_rearRight.getSelectedSensorPosition()));
 
-    SmartDashboard.putNumber("Front Left Encoder", m_frontLeft.getSelectedSensorPosition());
-    SmartDashboard.putNumber("Rear Left Encoder", m_rearLeft.getSelectedSensorPosition());
-    SmartDashboard.putNumber("Front Right Encoder", m_frontRight.getSelectedSensorPosition());
-    SmartDashboard.putNumber("Rear Right Encoder", m_rearRight.getSelectedSensorPosition());
+    // SmartDashboard.putNumber("Front Left Encoder", m_frontLeft.getSelectedSensorPosition());
+    // SmartDashboard.putNumber("Rear Left Encoder", m_rearLeft.getSelectedSensorPosition());
+    // SmartDashboard.putNumber("Front Right Encoder", m_frontRight.getSelectedSensorPosition());
+    // SmartDashboard.putNumber("Rear Right Encoder", m_rearRight.getSelectedSensorPosition());
 
-    SmartDashboard.putNumber("Gyro", m_gyro.getAngle());
+    // SmartDashboard.putNumber("Gyro", m_gyro.getAngle());
 
-    SmartDashboard.putNumber("X", m_odometry.getPoseMeters().getX());
-    SmartDashboard.putNumber("Y", m_odometry.getPoseMeters().getY());
-    SmartDashboard.putNumber("Rotation", m_odometry.getPoseMeters().getRotation().getDegrees());
+    // SmartDashboard.putNumber("X", m_odometry.getPoseMeters().getX());
+    // SmartDashboard.putNumber("Y", m_odometry.getPoseMeters().getY());
+    // SmartDashboard.putNumber("Rotation", m_odometry.getPoseMeters().getRotation().getDegrees());
     
     // Acceleration-based odometry
     if (SmartDashboard.getBoolean("Reset Accel Data", false)) {
@@ -94,10 +94,10 @@ public class DriveSubsystem extends SubsystemBase {
       resetAccelDistance();
     }
     updateAccelDistance();
-    SmartDashboard.putNumber("Velocity Forwards", getVelocityForward());
-    SmartDashboard.putNumber("Velocity Sideways", getVelocityStrafe());
-    SmartDashboard.putNumber("Distance Forwards", getDistanceForward());
-    SmartDashboard.putNumber("Distance Sideways", getDistanceStrafe());
+    // SmartDashboard.putNumber("Velocity Forwards", getVelocityForward());
+    // SmartDashboard.putNumber("Velocity Sideways", getVelocityStrafe());
+    // SmartDashboard.putNumber("Distance Forwards", getDistanceForward());
+    // SmartDashboard.putNumber("Distance Sideways", getDistanceStrafe());
   }
 
   /**

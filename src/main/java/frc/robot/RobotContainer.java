@@ -74,26 +74,26 @@ public class RobotContainer {
                   },
             m_driveSubsystem));
             
-    m_armSubsystem.setDefaultCommand(
-        new RunCommand(
-            () -> {
-                // Move arm extend
-                double extendOffset = deadzone(m_operatorController.getLeftTriggerAxis() - m_operatorController.getRightTriggerAxis()) * ArmConstants.kExtendRate;
-                int extendPos = (int)Math.min(m_armSubsystem.targetArmLengthTicks() + extendOffset, 0);
-                m_armSubsystem.SetExtensionPos(extendPos, true);
+    // m_armSubsystem.setDefaultCommand(
+    //     new RunCommand(
+    //         () -> {
+    //             // Move arm extend
+    //             double extendOffset = deadzone(m_operatorController.getLeftTriggerAxis() - m_operatorController.getRightTriggerAxis()) * ArmConstants.kExtendRate;
+    //             int extendPos = (int)Math.min(m_armSubsystem.targetArmLengthTicks() + extendOffset, 0);
+    //             m_armSubsystem.SetExtensionPos(extendPos, true);
 
-                // Move arm position
-                double rotateOffset = deadzone(-m_operatorController.getLeftY()) * ArmConstants.kRotateRate;
-                int rotatePos = (int)Math.max(m_armSubsystem.targetArmAngleTicks() + rotateOffset, 0);
-                m_armSubsystem.SetRotationPos(rotatePos, true);
+    //             // Move arm position
+    //             double rotateOffset = deadzone(-m_operatorController.getLeftY()) * ArmConstants.kRotateRate;
+    //             int rotatePos = (int)Math.max(m_armSubsystem.targetArmAngleTicks() + rotateOffset, 0);
+    //             m_armSubsystem.SetRotationPos(rotatePos, true);
 
-                // Adjust operator rumble based on motor current draw
-                double armRumble = 
-                    Math.max(m_armSubsystem.getCurrentDraw() - ArmConstants.kMinCurrentDraw, 0)
-                    / (ArmConstants.kMaxCurrentDraw - ArmConstants.kMinCurrentDraw);
-                m_operatorController.setRumble(RumbleType.kBothRumble, armRumble);
-                  },
-            m_armSubsystem));
+    //             // Adjust operator rumble based on motor current draw
+    //             double armRumble = 
+    //                 Math.max(m_armSubsystem.getCurrentDraw() - ArmConstants.kMinCurrentDraw, 0)
+    //                 / (ArmConstants.kMaxCurrentDraw - ArmConstants.kMinCurrentDraw);
+    //             m_operatorController.setRumble(RumbleType.kBothRumble, armRumble);
+    //               },
+    //         m_armSubsystem));
 
     m_wristSubsystem.setDefaultCommand(
       new RunCommand(
@@ -102,8 +102,9 @@ public class RobotContainer {
               double roll = deadzone(m_operatorController.getRightX()) * 45.0; // Scale to [-45, 45]
               double pitch = deadzone(m_operatorController.getRightY()) * 45.0; // Scale to [-45, 45]
   
-              m_wristSubsystem.setTargetAngles(roll, pitch);
-              m_wristSubsystem.update(pitch); // Apply
+              m_wristSubsystem.setTargetAngles(m_wristSubsystem.getCurrentRoll() + roll, m_wristSubsystem.getCurrentPitch() + pitch);
+              // m_wristSubsystem.setTargetAngles(roll, pitch);
+              m_wristSubsystem.update(); // Apply
           },
           m_wristSubsystem
       )
