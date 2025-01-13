@@ -17,6 +17,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.controller.*;
 import frc.robot.Constants.ArmConstants;
 
 public class WristSubsystem extends SubsystemBase {
@@ -26,7 +27,9 @@ public class WristSubsystem extends SubsystemBase {
     private SparkMaxConfig pitchMotorConfig; // Config for Neo 550
     private SparkClosedLoopController pitchPid; // PID controller for pitch
     private RelativeEncoder encoder; // Encoder for Neo 550
-    private ArmFeedForward arbFF;
+
+    // Arm Feed Forward, est values (kG = 0.19, kV = 1.32, kA = 0.01) rads (kG = 0.19, kV = 0.02, kA = 0.00) deg
+    private ArmFeedforward arbFF;
 
     private double targetRoll = 0; // Desired roll angle in degrees
     private double targetPitch = 0; // Desired pitch angle in degrees
@@ -35,6 +38,7 @@ public class WristSubsystem extends SubsystemBase {
     private static final double GEAR_RATIO = 135.0; // 45:1 Reduction gearbox, 3:1 (135:1) chain?
     private static final double ENCODER_COUNTS_PER_MOTOR_REV = 42.0;
     private static final double DEGREES_PER_REV = 360.0;
+    private static final double DEGREES_PARALLEL_TO_GROUND = 7.0;
     
     // Differential ratio between roll and pitch
     private final double wristDiffRatio = 1.0/3.0;
@@ -48,6 +52,8 @@ public class WristSubsystem extends SubsystemBase {
         pitchPid = m_pitchMotor.getClosedLoopController();
         encoder = m_pitchMotor.getEncoder();
         pitchMotorConfig = new SparkMaxConfig();
+
+        arbFF = new ArmFeedforward(0.19, 0.02, 0.0);
 
         // Set brake mode
         pitchMotorConfig
@@ -66,16 +72,16 @@ public class WristSubsystem extends SubsystemBase {
         // Configure PID loop - adjusted gains for degree-based control
         pitchMotorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(0.025)
+            .p(0.02)
             .i(0.0)
             .d(0.0)
             .outputRange(0, 0.5);
 
         // Set soft limits in degrees
         pitchMotorConfig.softLimit
-            .forwardSoftLimit(7.0)  // Maximum 7 degrees down
+            .forwardSoftLimit(DEGREES_PARALLEL_TO_GROUND)  // Maximum 7 degrees down
             .forwardSoftLimitEnabled(true)
-            .reverseSoftLimit(-0.01) // Maximum 0 degrees up (relative encoder, should be 0?)
+            .reverseSoftLimit(0) // Maximum 0 degrees up (relative encoder, should be 0?)
             .reverseSoftLimitEnabled(true);
 
         m_pitchMotor.configure(pitchMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -83,7 +89,7 @@ public class WristSubsystem extends SubsystemBase {
 
     public void setTargetAngles(double roll, double pitch) {
         // Clamp pitch angle to soft limits
-        this.targetPitch = Math.max(Math.min(pitch, 7.0), 0.0);
+        this.targetPitch = Math.max(Math.min(pitch, DEGREES_PARALLEL_TO_GROUND), 0.0);
         // Clamp roll angle to servo limits
         this.targetRoll = Math.max(Math.min(roll, 1), 0);
     }
@@ -101,19 +107,21 @@ public class WristSubsystem extends SubsystemBase {
     }
 
     public double getCurrentRoll() {
-        return m_rollServo.get();  // Convert servo position back to degrees
+        return m_rollServo.get();
     }
 
     public void update() {
         // Convert target angles to compensated angles
         double compensatedPitch = targetPitch + calculatePitchCompensation(targetRoll);
-        // double compensatedRoll = targetRoll + calculateRollCompensation(targetPitch);
-        double compensatedRoll = targetRoll;
 
         // Update servo and motor with compensated values
-        // m_rollServo.set(mapRollToServoPosition(compensatedRoll));
-        m_rollServo.set(compensatedRoll);
-        pitchPid.setReference(compensatedPitch, ControlType.kPosition, ClosedLoopSlot.kSlot0, arbFF);
+        m_rollServo.set(targetRoll);
+        pitchPid.setReference(
+            compensatedPitch, 
+            ControlType.kPosition, 
+            ClosedLoopSlot.kSlot0, 
+            arbFF.calculate((compensatedPitch - DEGREES_PARALLEL_TO_GROUND), 1) // Unsure what velocity should be
+        );
     }
 
     public void stop() {
@@ -127,20 +135,13 @@ public class WristSubsystem extends SubsystemBase {
         return rollAngle * wristDiffRatio;
         // return rollAngle * wristDiffRatio - (targetPitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio;
     }
-    
-    private double calculateRollCompensation(double pitchAngle) {
-        // Ignore very small angles to prevent tiny oscillations
-        if (Math.abs(pitchAngle) < MIN_COMPENSATION_ANGLE) return 0.0;
-        // For every degree of pitch, roll changes by 1/3 degree
-        return pitchAngle * wristDiffRatio;
-    }
 
     @Override
     public void periodic() {
         // Display encoder position and velocity in degrees
         SmartDashboard.putNumber("Pitch Angle (deg)", encoder.getPosition());
         SmartDashboard.putNumber("Target Pitch (deg)", targetPitch);
-        // SmartDashboard.putNumber("Pitch Velocity (deg/s)", encoder.getVelocity());
+        SmartDashboard.putNumber("Pitch Velocity (deg/s)", encoder.getVelocity());
         SmartDashboard.putNumber("Pitch Output (%)", m_pitchMotor.getAppliedOutput());
         SmartDashboard.putNumber("Pitch Output (amps)", m_pitchMotor.getOutputCurrent());
         SmartDashboard.putNumber("Target Roll", targetRoll);
@@ -148,7 +149,6 @@ public class WristSubsystem extends SubsystemBase {
 
         // Display compensation calculations
         SmartDashboard.putNumber("Compensated Pitch", targetPitch + calculatePitchCompensation(targetRoll));
-        SmartDashboard.putNumber("Compensated Roll", targetRoll + calculateRollCompensation(targetPitch));
         SmartDashboard.putNumber("Roll Servo Position", m_rollServo.get());
 
         // Handle encoder reset request
