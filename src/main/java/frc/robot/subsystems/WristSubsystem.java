@@ -53,7 +53,7 @@ public class WristSubsystem extends SubsystemBase {
         // Set brake mode
         pitchMotorConfig
             .inverted(false)
-            .smartCurrentLimit(20) // Trying to minimize damage to wrist from powerful motor
+            .smartCurrentLimit(5) // Trying to minimize damage to wrist from powerful motor
             .idleMode(IdleMode.kBrake);
             
         // Set up encoders with conversion factor for degrees
@@ -80,7 +80,7 @@ public class WristSubsystem extends SubsystemBase {
         pitchMotorConfig.softLimit
             .forwardSoftLimit(45.0)  // Maximum 45 degrees up
             .forwardSoftLimitEnabled(true)
-            .reverseSoftLimit(-45.0) // Maximum 45 degrees down
+            .reverseSoftLimit(0.0) // Maximum 0 degrees down (relative encoder, should be 0?)
             .reverseSoftLimitEnabled(true);
 
         m_pitchMotor.configure(pitchMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -92,7 +92,7 @@ public class WristSubsystem extends SubsystemBase {
 
     public void setTargetAngles(double roll, double pitch) {
         // Clamp pitch angle to soft limits
-        this.targetPitch = Math.min(Math.max(pitch, -45.0), 45.0);
+        this.targetPitch = Math.min(Math.max(pitch, 0.0), 45.0);
         // Clamp roll angle to servo limits
         this.targetRoll = Math.min(Math.max(roll, -45.0), 45.0);
     }
