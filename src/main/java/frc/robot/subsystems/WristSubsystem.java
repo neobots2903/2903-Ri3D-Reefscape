@@ -33,7 +33,7 @@ public class WristSubsystem extends SubsystemBase {
     private double targetPitch = 0; // Desired pitch angle in degrees
     
     // Constants for pitch angle conversion
-    private static final double GEAR_RATIO = 100.0; // TODO: GET RATIO
+    private static final double GEAR_RATIO = 45.0; // 45:1 Reduction
     private static final double ENCODER_COUNTS_PER_MOTOR_REV = 42.0;
     private static final double DEGREES_PER_REV = 360.0;
     
