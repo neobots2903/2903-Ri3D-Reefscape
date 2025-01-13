@@ -38,7 +38,7 @@ public class WristSubsystem extends SubsystemBase {
     private static final double GEAR_RATIO = 135.0; // 45:1 Reduction gearbox, 3:1 (135:1) chain?
     private static final double ENCODER_COUNTS_PER_MOTOR_REV = 42.0;
     private static final double DEGREES_PER_REV = 360.0;
-    private static final double DEGREES_PARALLEL_TO_GROUND = 7.0;
+    private static final double DEGREES_PARALLEL_TO_GROUND = 3.0;
     
     // Differential ratio between roll and pitch
     private final double wristDiffRatio = 1.0/3.0;
@@ -58,7 +58,7 @@ public class WristSubsystem extends SubsystemBase {
         // Set brake mode
         pitchMotorConfig
             .inverted(false)
-            .smartCurrentLimit(3) // Trying to minimize damage to wrist from powerful motor
+            .smartCurrentLimit(10) // Trying to minimize damage to wrist from powerful motor
             .idleMode(IdleMode.kBrake);
             
         // Set up encoders with conversion factor for degrees
@@ -72,10 +72,10 @@ public class WristSubsystem extends SubsystemBase {
         // Configure PID loop - adjusted gains for degree-based control
         pitchMotorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(0.02)
+            .p(0.1)
             .i(0.0)
             .d(0.0)
-            .outputRange(0, 0.5);
+            .outputRange(-1, 0.3);
 
         // Set soft limits in degrees
         pitchMotorConfig.softLimit
@@ -119,9 +119,14 @@ public class WristSubsystem extends SubsystemBase {
         pitchPid.setReference(
             compensatedPitch, 
             ControlType.kPosition, 
-            ClosedLoopSlot.kSlot0, 
-            arbFF.calculate((compensatedPitch - DEGREES_PARALLEL_TO_GROUND), 1) // Unsure what velocity should be
+            ClosedLoopSlot.kSlot0
         );
+        // pitchPid.setReference(
+        //     compensatedPitch, 
+        //     ControlType.kPosition, 
+        //     ClosedLoopSlot.kSlot0, 
+        //     arbFF.calculate((compensatedPitch - DEGREES_PARALLEL_TO_GROUND), 5) // Unsure what velocity should be
+        // );
     }
 
     public void stop() {
@@ -132,8 +137,8 @@ public class WristSubsystem extends SubsystemBase {
         // Ignore very small angles to prevent tiny oscillations
         if (Math.abs(rollAngle) < MIN_COMPENSATION_ANGLE) return 0.0;
         // For every degree of roll, pitch changes by 1/3 degree
-        return rollAngle * wristDiffRatio;
-        // return rollAngle * wristDiffRatio - (targetPitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio;
+        // return rollAngle * wristDiffRatio;
+        return rollAngle * wristDiffRatio - (targetPitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio;
     }
 
     @Override
@@ -144,7 +149,7 @@ public class WristSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Pitch Velocity (deg/s)", encoder.getVelocity());
         SmartDashboard.putNumber("Pitch Output (%)", m_pitchMotor.getAppliedOutput());
         SmartDashboard.putNumber("Pitch Output (amps)", m_pitchMotor.getOutputCurrent());
-        SmartDashboard.putNumber("Target Roll", targetRoll);
+        //SmartDashboard.putNumber("Target Roll", targetRoll);
         SmartDashboard.putNumber("Position Error (deg)", targetPitch - encoder.getPosition());
 
         // Display compensation calculations
