@@ -81,7 +81,7 @@ public class WristSubsystem extends SubsystemBase {
         // Clamp pitch angle to soft limits
         this.targetPitch = Math.max(Math.min(pitch, 7.0), 0.0);
         // Clamp roll angle to servo limits
-        this.targetRoll = Math.max(Math.min(roll, 45.0), -45.0);
+        this.targetRoll = Math.max(Math.min(roll, 1), 0);
     }
 
     public double getTargetRoll() {
@@ -107,7 +107,8 @@ public class WristSubsystem extends SubsystemBase {
         double compensatedRoll = targetRoll;
 
         // Update servo and motor with compensated values
-        m_rollServo.set(mapRollToServoPosition(compensatedRoll));
+        // m_rollServo.set(mapRollToServoPosition(compensatedRoll));
+        m_rollServo.set(compensatedRoll);
         pitchPid.setReference(compensatedPitch, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
