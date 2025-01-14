@@ -72,7 +72,7 @@ public class WristSubsystem extends SubsystemBase {
         // Configure PID loop - adjusted gains for degree-based control
         pitchMotorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(0.1)
+            .p(0.3)
             .i(0.0)
             .d(0.0)
             .outputRange(-1, 0.1);
@@ -111,22 +111,13 @@ public class WristSubsystem extends SubsystemBase {
     }
 
     public void update() {
-        // Convert target angles to compensated angles
-        double compensatedPitch = targetPitch + calculatePitchCompensation(targetRoll);
-
         // Update servo and motor with compensated values
         m_rollServo.set(targetRoll);
         pitchPid.setReference(
-            compensatedPitch, 
+            targetPitch,
             ControlType.kPosition, 
             ClosedLoopSlot.kSlot0
         );
-        // pitchPid.setReference(
-        //     compensatedPitch, 
-        //     ControlType.kPosition, 
-        //     ClosedLoopSlot.kSlot0, 
-        //     arbFF.calculate((compensatedPitch - DEGREES_PARALLEL_TO_GROUND), 5) // Unsure what velocity should be
-        // );
     }
 
     public void stop() {
@@ -135,10 +126,10 @@ public class WristSubsystem extends SubsystemBase {
 
     private double calculatePitchCompensation(double rollAngle) {
         // Ignore very small angles to prevent tiny oscillations
-        // if (Math.abs(rollAngle) < MIN_COMPENSATION_ANGLE) return 0.0;
+        if (Math.abs(rollAngle) < MIN_COMPENSATION_ANGLE) return 0.0;
         // For every degree of roll, pitch changes by 1/3 degree
-        // return rollAngle * wristDiffRatio;
-        return rollAngle * wristDiffRatio - (targetPitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio;
+        return rollAngle * wristDiffRatio;
+        // return rollAngle * wristDiffRatio - (targetPitch * (1 - wristDiffRatio)) + 1 - wristDiffRatio;
     }
 
     @Override
