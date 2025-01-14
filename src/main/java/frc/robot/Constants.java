@@ -108,7 +108,7 @@ public final class Constants {
     public final static int kExtendedTicksPerInch = -3779;
 
     // Intake
-    public final static double kIntakeSpeed = 0.8;
+    public final static double kIntakeSpeed = 1.0;
 
     // Wrist
     public final static double kWristSpeed = 0.02;

@@ -16,6 +16,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -267,5 +269,6 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Arm Extend Motor Amps", m_armExtend.getStatorCurrent());
 
     SmartDashboard.putBoolean("Zeroing Done", autoZeroDone());
+    SmartDashboard.putNumber("Intake Current", m_intake.getOutputCurrent());
   }
 }

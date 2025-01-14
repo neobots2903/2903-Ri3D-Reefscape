@@ -91,7 +91,7 @@ public class WristSubsystem extends SubsystemBase {
         // Clamp pitch angle to soft limits
         this.targetPitch = Math.max(Math.min(pitch, DEGREES_PARALLEL_TO_GROUND), 0.0);
         // Clamp roll angle to servo limits
-        this.targetRoll = Math.max(Math.min(roll, 1), 0);
+        this.targetRoll = Math.max(Math.min(roll, 0.5), 0); // Full 1 is too far
     }
 
     public double getTargetRoll() {

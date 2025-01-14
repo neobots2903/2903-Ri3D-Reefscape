@@ -74,32 +74,33 @@ public class RobotContainer {
                   },
             m_driveSubsystem));
             
-    // m_armSubsystem.setDefaultCommand(
-    //     new RunCommand(
-    //         () -> {
-    //             // Move arm extend
-    //             double extendOffset = deadzone(m_operatorController.getLeftTriggerAxis() - m_operatorController.getRightTriggerAxis()) * ArmConstants.kExtendRate;
-    //             int extendPos = (int)Math.min(m_armSubsystem.targetArmLengthTicks() + extendOffset, 0);
-    //             m_armSubsystem.SetExtensionPos(extendPos, true);
+    m_armSubsystem.setDefaultCommand(
+        new RunCommand(
+            () -> {
+                // Move arm extend
+                double extendOffset = deadzone(m_operatorController.getLeftTriggerAxis() - m_operatorController.getRightTriggerAxis()) * ArmConstants.kExtendRate;
+                int extendPos = (int)Math.min(m_armSubsystem.targetArmLengthTicks() + extendOffset, 0);
+                m_armSubsystem.SetExtensionPos(extendPos, true);
 
-    //             // Move arm position
-    //             double rotateOffset = deadzone(-m_operatorController.getLeftY()) * ArmConstants.kRotateRate;
-    //             int rotatePos = (int)Math.max(m_armSubsystem.targetArmAngleTicks() + rotateOffset, 0);
-    //             m_armSubsystem.SetRotationPos(rotatePos, true);
+                // Move arm position
+                double rotateOffset = deadzone(-m_operatorController.getLeftY()) * ArmConstants.kRotateRate;
+                int rotatePos = (int)Math.max(m_armSubsystem.targetArmAngleTicks() + rotateOffset, 0);
+                m_armSubsystem.SetRotationPos(rotatePos, true);
 
-    //             // Adjust operator rumble based on motor current draw
-    //             double armRumble = 
-    //                 Math.max(m_armSubsystem.getCurrentDraw() - ArmConstants.kMinCurrentDraw, 0)
-    //                 / (ArmConstants.kMaxCurrentDraw - ArmConstants.kMinCurrentDraw);
-    //             m_operatorController.setRumble(RumbleType.kBothRumble, armRumble);
-    //               },
-    //         m_armSubsystem));
+                // Adjust operator rumble based on motor current draw
+                double armRumble = 
+                    Math.max(m_armSubsystem.getCurrentDraw() - ArmConstants.kMinCurrentDraw, 0)
+                    / (ArmConstants.kMaxCurrentDraw - ArmConstants.kMinCurrentDraw);
+                m_operatorController.setRumble(RumbleType.kBothRumble, armRumble);
+                  },
+            m_armSubsystem));
 
     m_wristSubsystem.setDefaultCommand(
       new RunCommand(
           () -> {
               // Map joystick inputs to target angles
-              double roll = deadzone(m_operatorController.getRightX()) * 0.5; // Constants later...
+              double roll = deadzone(m_operatorController.getLeftX()) * 0.5; // Constants later...
+
               double pitch = deadzone(m_operatorController.getRightY()) * 50;
   
               m_wristSubsystem.setTargetAngles(m_wristSubsystem.getCurrentRoll() + roll, m_wristSubsystem.getCurrentPitch() + pitch);
@@ -137,13 +138,13 @@ public class RobotContainer {
 
         // Output coral
     m_operatorController.rightBumper()
-        .whileTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(ArmConstants.kIntakeSpeed)))
-        .whileFalse(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(0)));
+        .onTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(ArmConstants.kIntakeSpeed)))
+        .onFalse(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(0)));
     
         // Input coral
     m_operatorController.leftBumper()
-        .whileTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(-ArmConstants.kIntakeSpeed)))
-        .whileFalse(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(0)));
+        .onTrue(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(-ArmConstants.kIntakeSpeed)))
+        .onFalse(new InstantCommand(() -> m_armSubsystem.SetIntakeSpeed(0)));
 
         // Down+Left D-Pad to reach Coral L1
     m_operatorController.povLeft().and(m_operatorController.povDown())
